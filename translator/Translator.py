@@ -86,21 +86,9 @@ if(inputfile != ''):
 #if header file is specified, then generate a header file (and a cpp file) that enables the message formats specified in the config file to be used in C++ code
 if(headerFile != ''):
     def toCamelCase(s): #https://www.w3resource.com/python-exercises/string/python-data-type-string-exercise-96.php
-        #st = str(s)
-        #print(st)
-        #s1 = ''.join(c if c != ' ' else '_' for c in s)
-        #s2 = ''
-        #for char in s1:
-            #print((char.isalnum() or "_") and (not ("," or ".")))
-        #    if (char.isalnum() or "_") and (not ("," or ".")):
-        #        s2 += char
         s1 = sub(r'[^a-zA-Z0-9]+', ' ', s).title().replace(" ", "")
-        #s2 = ''.join(d if ((d.isalnum() or '_') and (not (',' or '.'))) else '_' for d in s1)
         return s1
-        #s = sub(r"\(\|-\)\+\.,", " ", s).title().replace(" ", "") #r"(_|-)+"
-        #return s
-        #return ''#.join([s[0].lower(), s[1:]])
-        #''.join(x for x in s.title() if not x.isspace())
+    
     if(os.path.isfile(headerFile + '.hpp')):
        os.remove(headerFile + '.hpp')
     if(os.path.isfile(headerFile + '.cpp')):
@@ -109,10 +97,10 @@ if(headerFile != ''):
     implStream = open(headerFile + ".cpp", 'w')
     
     #headerStream.write("#include \"structDefinitions.hpp\"\n#include \"mcp2515.h\"\n")
-    headerStream.write("#include \"CANHelper.hpp\"\n")
+    headerStream.write("#include \"CANApi/CANHelper.hpp\"\n")
     #headerStream.write("namespace CANHelper\n{\n\tvoid DispatchMsg(can_frame msg);\n}\n")
     headerStream.write("namespace CANHelper::Messages\n{\n")
-    implStream.write('#include \"' + headerFile + '.hpp\"\nnamespace CANHelper\n{\n\tvoid CanMsgHandler::DispatchMsg(can_frame msg)\n\t{\n\t\tswitch(msg.can_id)\n\t\t{\n')
+    implStream.write('#include \"CANApi/' + headerFile + '.hpp\"\nnamespace CANHelper\n{\n\tvoid CanMsgHandler::DispatchMsg(can_frame msg)\n\t{\n\t\tswitch(msg.can_id)\n\t\t{\n')
 
     #create header file with class declarations for each record in the config
     for i in range(4, 24):#sheet.max_row + 1):
@@ -190,44 +178,3 @@ if(headerFile != ''):
     implStream.write("\t}\n}\n")
     implStream.close()
     print("c++ files generated file generated")
-
-        # match row[17]: #col R is index 17
-        #     case '2*float32':
-        #         headerStream.write("public MSG_2float32\n\t\t{\n\t\tpublic:\n")
-        #         headerStream.write('\t\t\tusing MSG_2float32::MSG_2float32;\n')
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[7]) + "() { return this->get0(); }\n") #col H is index 7
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[11]) + "() { return this->get1(); }\n") #col L is index 11
-        #     case '3*u_int16':
-        #         headerStream.write("public MSG_3uint16\n\t\t{\n\t\tpublic:\n") #todo class
-        #         headerStream.write('\t\t\tusing MSG_3uint16::MSG_3uint16;\n')
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[7]) + "() { return this->get0(); }\n")
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[9]) + "() { return this->get1(); }\n")#col J is index 9
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[11]) + "() { return this->get2(); }\n")
-        #     case 'float32, int32':
-        #         headerStream.write("public MSG_float32_int32\n\t\t{\n\t\tpublic:\n") #todo class
-        #         headerStream.write('\t\t\tusing MSG_float32_int32::MSG_float32_int32;\n')
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[7]) + "() { return this->get0(); }\n")
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[11]) + "() { return this->get1(); }\n")
-        #     case 'u_int32 & char[4]':
-        #         headerStream.write("public MSG_uint32_char4\n\t\t{\n\t\tpublic:\n") #todo class
-        #         headerStream.write('\t\t\tusing MSG_uint32_char4::MSG_uint32_char4;\n')
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[7]) + "() { return this->get0(); }\n")
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[11]) + "() { return this->get1(); }\n")
-        #     case 'int16 & 2*u_int16 & 2*u_int8':
-        #         headerStream.write("public MSG_int16_2uint16_2uint8\n\t\t{\n\t\tpublic:\n") #todo class
-        #         headerStream.write('\t\t\tusing MSG_int16_2uint16_2uint8::MSG_int16_2uint16_2uint8;\n')
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[7]) + "() { return this->get0(); }\n")
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[9]) + "() { return this->get1(); }\n")
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[11]) + "() { return this->get2(); }\n")
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[13]) + "() { return this->get3(); }\n") #col N is index 13
-        #         headerStream.write("\t\t\tinline auto " + toCamelCase(row[14]) + "() { return this->get4(); }\n") #col O is index 14
-        #     case '6*int8':
-        #         headerStream.write("public MSG_6int8\n\t\t{\n\t\tpublic:\n")
-        #         headerStream.write('\t\t\tusing MSG_6int8::MSG_6int8\n')
-        #         headerStream.write("\t\t\t//WIP\n")
-        #     case _:
-        #         print("Unrecognised data structure ", end='')
-        #         print(row[17])
-        #         headerStream.close()
-        #         sys.exit(3)
-        #headerStream.write("\t\t};\n\t}\n")
