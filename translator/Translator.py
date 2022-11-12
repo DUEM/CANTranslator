@@ -100,7 +100,7 @@ if(headerFile != ''):
     headerStream.write("#include \"CANApi/CANHelper.hpp\"\n")
     #headerStream.write("namespace CANHelper\n{\n\tvoid DispatchMsg(can_frame msg);\n}\n")
     headerStream.write("namespace CANHelper::Messages\n{\n")
-    implStream.write('#include \"CANApi/' + headerFile + '.hpp\"\nnamespace CANHelper\n{\n\tvoid CanMsgHandler::DispatchMsg(can_frame msg)\n\t{\n\t\tswitch(msg.can_id)\n\t\t{\n')
+    implStream.write('#include \"CANApi/' + os.path.basename(headerFile) + '.hpp\"\nnamespace CANHelper\n{\n\tvoid CanMsgHandler::DispatchMsg(can_frame msg)\n\t{\n\t\tswitch(msg.can_id)\n\t\t{\n')
 
     #create header file with class declarations for each record in the config
     for i in range(3, 24):#sheet.max_row + 1):
