@@ -1,0 +1,3 @@
+[submodule "CANApi"]
+	path = CANApi
+	url = https://github.com/DUSC22/CANApi.git
