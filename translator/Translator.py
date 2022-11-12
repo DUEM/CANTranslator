@@ -103,7 +103,7 @@ if(headerFile != ''):
     implStream.write('#include \"CANApi/' + headerFile + '.hpp\"\nnamespace CANHelper\n{\n\tvoid CanMsgHandler::DispatchMsg(can_frame msg)\n\t{\n\t\tswitch(msg.can_id)\n\t\t{\n')
 
     #create header file with class declarations for each record in the config
-    for i in range(4, 24):#sheet.max_row + 1):
+    for i in range(3, 24):#sheet.max_row + 1):
         row = [cell.value for cell in sheet[i][0:sheet.max_column]]
         print(row) # list of cell values of this row
         #print(row[1] + "->" + sub(r"(|-)+.", " ", str(row[1])))
