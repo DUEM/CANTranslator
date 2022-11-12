@@ -1,3 +1,4 @@
 [submodule "CANApi"]
 	path = CANApi
 	url = https://github.com/DUEM/CANApi.git
+	branch = dev
