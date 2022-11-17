@@ -97,10 +97,12 @@ if(headerFile != ''):
     implStream = open(headerFile + ".cpp", 'w')
     
     #headerStream.write("#include \"structDefinitions.hpp\"\n#include \"mcp2515.h\"\n")
-    headerStream.write("#include \"CANApi/CANHelper.hpp\"\n")
+    headerStream.write("#ifndef " + os.path.basename(headerFile) + "_INCLUDE_GUARD\n")
+    headerStream.write("#define " + os.path.basename(headerFile) + "_INCLUDE_GUARD\n")
+    headerStream.write("#include \"CANHelper.hpp\"\n")
     #headerStream.write("namespace CANHelper\n{\n\tvoid DispatchMsg(can_frame msg);\n}\n")
     headerStream.write("namespace CANHelper::Messages\n{\n")
-    implStream.write('#include \"CANApi/' + os.path.basename(headerFile) + '.hpp\"\nnamespace CANHelper\n{\n\tvoid CanMsgHandler::DispatchMsg(can_frame msg)\n\t{\n\t\tswitch(msg.can_id)\n\t\t{\n')
+    implStream.write('#include \"' + os.path.basename(headerFile) + '.hpp\"\nnamespace CANHelper\n{\n\tvoid CanMsgHandler::DispatchMsg(can_frame msg)\n\t{\n\t\tswitch(msg.can_id)\n\t\t{\n')
 
     #create header file with class declarations for each record in the config
     for i in range(3, 24):#sheet.max_row + 1):
@@ -125,7 +127,7 @@ if(headerFile != ''):
         implStream.write("\t\t\tMessages::" + "processMessage((Messages::" + toCamelCase(row[2]) + "::_" + toCamelCase(row[1]) + "&)msg);\n")
         implStream.write("\t\t\tbreak;\n")
 
-        print(row[17])
+        print(row[17]) #NOTE: Will rewrite properly eventually
         match row[17]: #col R is index 17
             case '2*float32':
                 headerStream.write("\t\t\t\tfloat " + toCamelCase(row[7]) + ";\n") #col H is index 7
@@ -148,6 +150,12 @@ if(headerFile != ''):
                 headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[14]) + ";\n") #col O is index 14
             case '6*int8':
                 headerStream.write("\t\t\t\t//WIP\n")
+            case '5*u_int8':
+                headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[7]) + ";\n")
+                headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[8]) + ";\n")
+                headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[9]) + ";\n")
+                headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[10]) + ";\n") #col N is index 13
+                headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[11]) + ";\n") #col O is index 14
             case _:
                 print("Unrecognised data structure ", end='')
                 print(row[17])
@@ -170,6 +178,7 @@ if(headerFile != ''):
     headerStream.write("#endif\n")
 
     headerStream.write("}\n")
+    headerStream.write("#endif")
     headerStream.close()
     implStream.write("\t\t}\n")
     implStream.write("#ifdef PROCESS_ALL_MSG\n")
