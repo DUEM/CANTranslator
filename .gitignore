@@ -1,0 +1,3 @@
+#ignore temporary excel file created when excel is open
+~$*
+**/~$*

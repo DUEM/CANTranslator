@@ -2,7 +2,7 @@ import os
 import struct
 import sys, getopt
 from openpyxl import load_workbook, Workbook
-from re import sub
+from re import sub, compile
 from io import open
 
 #handle command line arguments
@@ -29,7 +29,7 @@ print("Config file: " + configFile)
 print("Header file: " + headerFile)
 
 #load configFile
-wb = load_workbook(configFile)
+wb = load_workbook(configFile, read_only=True)
 sheet = wb.active
 
 #if input file is specified, then translate its contents to something that can be read and processed. It should be a hex dump of CAN messages
@@ -105,8 +105,10 @@ if(headerFile != ''):
     implStream.write('#include \"' + os.path.basename(headerFile) + '.hpp\"\nnamespace CANHelper\n{\n\tvoid CanMsgHandler::DispatchMsg(can_frame msg)\n\t{\n\t\tswitch(msg.can_id)\n\t\t{\n')
 
     #create header file with class declarations for each record in the config
-    for i in range(3, 24):#sheet.max_row + 1):
-        row = [cell.value for cell in sheet[i][0:sheet.max_column]]
+    rowNumber = 1
+    while not (str(sheet.cell(rowNumber, 1).value) == "END"):
+        row = [cell.value for cell in sheet[rowNumber][0:18]] #columns 0 to 17 contains table. Anything beyond 17 are just notes and not relevant
+        rowNumber = rowNumber + 1
         print(row) # list of cell values of this row
         #print(row[1] + "->" + sub(r"(|-)+.", " ", str(row[1])))
         #print(row[1] + '->' + toCamelCase(row[1]))
@@ -118,52 +120,33 @@ if(headerFile != ''):
         headerStream.write("\t\tstruct _" + toCamelCase(row[1]) + " : public Messages::CANMsg {\n")
         #headerStream.write("\t\t\tMsgMetadata metadata;\n")
         headerStream.write("\t\t\tstruct canData\n\t\t\t{\n")
-        #headerStream.write("\t\tclass _" + toCamelCase(row[1]) + " : ")
 
         implStream.write("#ifdef USE_MSG_" + toCamelCase(row[2]) + "_" + toCamelCase(row[1]) + "\n")
         implStream.write('\t\tcase ' + row[4] + ':\n')
-        #implStream.write('\t\t\treturn Messages::' + toCamelCase(row[2]) + '::' + toCamelCase(row[1]) + "(msg.data);\n")
-        #implStream.write('\t\t\tMessages::' + toCamelCase(row[2]) + '::_' + toCamelCase(row[1]) + "::processMessage((" + toCamelCase(row[2]) + "::_" + toCamelCase(row[1]) + "&)msg);\n")
         implStream.write("\t\t\tMessages::" + "processMessage((Messages::" + toCamelCase(row[2]) + "::_" + toCamelCase(row[1]) + "&)msg);\n")
         implStream.write("\t\t\tbreak;\n")
 
-        print(row[17]) #NOTE: Will rewrite properly eventually
-        match row[17]: #col R is index 17
-            case '2*float32':
-                headerStream.write("\t\t\t\tfloat " + toCamelCase(row[7]) + ";\n") #col H is index 7
-                headerStream.write("\t\t\t\tfloat " + toCamelCase(row[11]) + ";\n") #col L is index 11
-            case '3*u_int16':
-                headerStream.write("\t\t\t\tuint16_t " + toCamelCase(row[7]) + ";\n")
-                headerStream.write("\t\t\t\tuint16_t " + toCamelCase(row[9]) + ";\n") #col J is index 9
-                headerStream.write("\t\t\t\tuint16_t " + toCamelCase(row[11]) + ";\n")
-            case 'float32, int32':
-                headerStream.write("\t\t\t\tfloat " + toCamelCase(row[7]) + ";\n")
-                headerStream.write("\t\t\t\tint " + toCamelCase(row[11]) + ";\n")
-            case 'u_int32 & char[4]':
-                headerStream.write("\t\t\t\tuint32_t " + toCamelCase(row[7]) + ";\n")
-                headerStream.write("\t\t\t\tchar* " + toCamelCase(row[11]) + ";\n")
-            case 'int16 & 2*u_int16 & 2*u_int8':
-                headerStream.write("\t\t\t\tint16_t " + toCamelCase(row[7]) + ";\n")
-                headerStream.write("\t\t\t\tuint16_t " + toCamelCase(row[9]) + ";\n")
-                headerStream.write("\t\t\t\tuint16_t " + toCamelCase(row[11]) + ";\n")
-                headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[13]) + ";\n") #col N is index 13
-                headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[14]) + ";\n") #col O is index 14
-            case '6*int8':
-                headerStream.write("\t\t\t\t//WIP\n")
-            case '5*u_int8':
-                headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[7]) + ";\n")
-                headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[8]) + ";\n")
-                headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[9]) + ";\n")
-                headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[10]) + ";\n") #col N is index 13
-                headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[11]) + ";\n") #col O is index 14
-            case _:
-                print("Unrecognised data structure ", end='')
-                print(row[17])
-                headerStream.close()
-                sys.exit(3)
+        #print(row[17])
+        #check validity of datatype. TODO: check that datatype matches the DLC.
+        datatype = row[17].replace(' ', '')
+        if not compile("^([1-8]\*)?([a-z]|[1-9])(,([1-8]\*)?([a-z]|[1-9]))*").match(datatype):
+            print("Invalid datatype", end='')
+            print(datatype)
+            sys.exit(4)
         
-        #headerStream.write("\t\t\tinline can_id id() { return CAN_ID_" + toCamelCase(row[2]) + "_" + toCamelCase(row[1]) + "; }\n")
-        #headerStream.write("\t\t\tinline __u8 dlc() { return CAN_DLC_" + toCamelCase(row[2]) + "_" + toCamelCase(row[1]) + "; }\n")
+        byteLabelIndex = 7 #data description starts at index 7
+        for type in datatype.split(','):
+            temp = type.split('*')
+            noOfRepeats = 1
+            typeLabel = temp[0]
+            if len(temp) == 2:
+                noOfRepeats = int(temp[0])
+                typeLabel = temp[1]
+            for i in range(0, noOfRepeats):
+                while row[byteLabelIndex] == 'IN USE' or row[byteLabelIndex] == '-':
+                    byteLabelIndex = byteLabelIndex + 1
+                headerStream.write("\t\t\t\t" + typeLabel + " " + toCamelCase(row[byteLabelIndex]) + "\n")
+                byteLabelIndex = byteLabelIndex + 1
 
         headerStream.write("\t\t\t} __attribute__((aligned(8)));\n")
         headerStream.write("\t\t\tcanData data;\n")
@@ -173,6 +156,7 @@ if(headerFile != ''):
         headerStream.write("#endif\n")
         implStream.write("#endif\n")
 
+    #process all message declaration
     headerStream.write("#ifdef PROCESS_ALL_MSG\n")
     headerStream.write("\tvoid processAll(CANMsg& msg);\n")
     headerStream.write("#endif\n")
@@ -180,6 +164,7 @@ if(headerFile != ''):
     headerStream.write("}\n")
     headerStream.write("#endif")
     headerStream.close()
+
     implStream.write("\t\t}\n")
     implStream.write("#ifdef PROCESS_ALL_MSG\n")
     implStream.write("\t\tprocessAll((Messages::CANMsg&) msg);\n")
@@ -187,3 +172,49 @@ if(headerFile != ''):
     implStream.write("\t}\n}\n")
     implStream.close()
     print("c++ files generated file generated")
+
+    #match typeLabel:
+    #            case 'float32':
+    #                headerStream.write("float " + toCamelCase(row[byteLabelIndex]))
+    #                byteLabelIndex = byteLabelIndex + 4
+    #            case _:
+    #                print("Unrecognised type ", end='')
+    #                print(typeLabel)
+    #                sys.exit(3)
+
+    # match row[17]: #col R is index 17
+        #     case '2*float32':
+        #         headerStream.write("\t\t\t\tfloat " + toCamelCase(row[7]) + ";\n") #col H is index 7
+        #         headerStream.write("\t\t\t\tfloat " + toCamelCase(row[11]) + ";\n") #col L is index 11
+        #     case '3*u_int16':
+        #         headerStream.write("\t\t\t\tuint16_t " + toCamelCase(row[7]) + ";\n")
+        #         headerStream.write("\t\t\t\tuint16_t " + toCamelCase(row[9]) + ";\n") #col J is index 9
+        #         headerStream.write("\t\t\t\tuint16_t " + toCamelCase(row[11]) + ";\n")
+        #     case 'float32, int32':
+        #         headerStream.write("\t\t\t\tfloat " + toCamelCase(row[7]) + ";\n")
+        #         headerStream.write("\t\t\t\tint " + toCamelCase(row[11]) + ";\n")
+        #     case 'u_int32 & char[4]':
+        #         headerStream.write("\t\t\t\tuint32_t " + toCamelCase(row[7]) + ";\n")
+        #         headerStream.write("\t\t\t\tchar* " + toCamelCase(row[11]) + ";\n")
+        #     case 'int16 & 2*u_int16 & 2*u_int8':
+        #         headerStream.write("\t\t\t\tint16_t " + toCamelCase(row[7]) + ";\n")
+        #         headerStream.write("\t\t\t\tuint16_t " + toCamelCase(row[9]) + ";\n")
+        #         headerStream.write("\t\t\t\tuint16_t " + toCamelCase(row[11]) + ";\n")
+        #         headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[13]) + ";\n") #col N is index 13
+        #         headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[14]) + ";\n") #col O is index 14
+        #     case '6*int8':
+        #         headerStream.write("\t\t\t\t//WIP\n")
+        #     case '5*u_int8':
+        #         headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[7]) + ";\n")
+        #         headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[8]) + ";\n")
+        #         headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[9]) + ";\n")
+        #         headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[10]) + ";\n") #col N is index 13
+        #         headerStream.write("\t\t\t\tuint8_t " + toCamelCase(row[11]) + ";\n") #col O is index 14
+        #     case _:
+        #         print("Unrecognised data structure ", end='')
+        #         print(row[17])
+        #         headerStream.close()
+        #         sys.exit(3)
+        
+        #headerStream.write("\t\t\tinline can_id id() { return CAN_ID_" + toCamelCase(row[2]) + "_" + toCamelCase(row[1]) + "; }\n")
+        #headerStream.write("\t\t\tinline __u8 dlc() { return CAN_DLC_" + toCamelCase(row[2]) + "_" + toCamelCase(row[1]) + "; }\n")
