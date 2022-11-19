@@ -145,7 +145,7 @@ if(headerFile != ''):
             for i in range(0, noOfRepeats):
                 while row[byteLabelIndex] == 'IN USE' or row[byteLabelIndex] == '-':
                     byteLabelIndex = byteLabelIndex + 1
-                headerStream.write("\t\t\t\t" + typeLabel + " " + toCamelCase(row[byteLabelIndex]) + "\n")
+                headerStream.write("\t\t\t\t" + typeLabel + " " + toCamelCase(row[byteLabelIndex]) + ";\n")
                 byteLabelIndex = byteLabelIndex + 1
 
         headerStream.write("\t\t\t} __attribute__((aligned(8)));\n")
