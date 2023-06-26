@@ -1,0 +1,151 @@
+Active/Confirmed,Item,Source,Period (s),CAN_ID,CAN_ID (dec),DLC,BYTE_0,BYTE_1,BYTE_2,BYTE_3,BYTE_4,BYTE_5,BYTE_6,BYTE_7,freq,rate (byte/s),data type,struct unpack code,c struct,Labels to be used in code,ItemCC,SourceCC,BYTE_0CC,BYTE_1CC,BYTE_2CC,BYTE_3CC,BYTE_4CC,BYTE_5CC,BYTE_6CC,BYTE_7CC,,,,,
+Y,Time and fix,Telemetry,2,0x0F6,246,8,GPS_hour,GPS_minute,GPS_seconds,GPS_day,GPS_month,GPS_year,GPS_fix,GPS_fixquality,0.50,4.00,8*uint8,<BBBBBBBB,"struct canData {
+	uint8_t GpsHour;
+	uint8_t GpsMinute;
+	uint8_t GpsSeconds;
+	uint8_t GpsDay;
+	uint8_t GpsMonth;
+	uint8_t GpsYear;
+	uint8_t GpsFix;
+	uint8_t GpsFixquality;
+}",,TimeAndFix,Telemetry,GpsHour,GpsMinute,GpsSeconds,GpsDay,GpsMonth,GpsYear,GpsFix,GpsFixquality,,,,,
+Y,Speed and Angle,Telemetry,2,0x0F7,247,8,GPS_speed,IN USE,IN USE,IN USE,GPS_angle,IN USE,IN USE,IN USE,0.50,4.00,2*float,<ff,"struct canData {
+	float GpsSpeed;
+	float GpsAngle;
+}",,SpeedAndAngle,Telemetry,GpsSpeed,-,-,-,GpsAngle,-,-,-,,,,,
+Y,Latitude,Telemetry,2,0x0F8,248,5,GPS_latitude,IN USE,IN USE,IN USE,GPS_lat,-,-,-,0.50,2.50,"float, char",<fc,"struct canData {
+	float GpsLatitude;
+	char GpsLat;
+}",,Latitude,Telemetry,GpsLatitude,-,-,-,GpsLat,-,-,-,,,,,
+Y,Longitude,Telemetry,2,0x0F9,249,5,GPS_longitude,IN USE,IN USE,IN USE,GPS_lon,-,-,-,0.50,2.50,"float, char",<fc,"struct canData {
+	float GpsLongitude;
+	char GpsLon;
+}",,Longitude,Telemetry,GpsLongitude,-,-,-,GpsLon,-,-,-,,,,,
+Y,Altitude and Satellites,Telemetry,2,0x0FA,250,5,GPS_altitude,IN USE,IN USE,IN USE,GPS_satellites,-,-,-,0.50,2.50,"float, uint8",<fB,"struct canData {
+	float GpsAltitude;
+	uint8_t GpsSatellites;
+}",,AltitudeAndSatellites,Telemetry,GpsAltitude,-,-,-,GpsSatellites,-,-,-,,,,,
+Y,System status messages,Telemetry,2,0x111,273,8,Power,Writing to SD,GPS Time Obtained,Loaded Config,Flag,spare1,spare2,spare3,0.50,4.00,8*uint8,<BBBBBBBB,"struct canData {
+	uint8_t Power;
+	uint8_t WritingToSd;
+	uint8_t GpsTimeObtained;
+	uint8_t LoadedConfig;
+	uint8_t Flag;
+	uint8_t Spare1;
+	uint8_t Spare2;
+	uint8_t Spare3;
+}",,SystemStatusMessages,Telemetry,Power,WritingToSd,GpsTimeObtained,LoadedConfig,Flag,Spare1,Spare2,Spare3,,,,,
+Y,Testbed enviroCAN.ino1,Testbed,,0x1B1,433,8,Temp deg C,IN USE,IN USE,IN USE,Humidity,IN USE,IN USE,IN USE,,,2*float,<ff,"struct canData {
+	float TempDegC;
+	float Humidity;
+}",,TestbedEnvirocanIno,Testbed,TempDegC,-,-,-,Humidity,-,-,-,,,,,
+Y,Testbed enviroCAN.ino2,Testbed,,0x1B2,434,8,Heat index deg C,IN USE,IN USE,IN USE,LDR reading,IN USE,IN USE,IN USE,,,"float, int32",<fi,"struct canData {
+	float HeatIndexDegC;
+	int32_t LdrReading;
+}",,TestbedEnvirocanIno,Testbed,HeatIndexDegC,-,-,-,LdrReading,-,-,-,,,,,
+Y,"speed_val, curr_val",driver_controls,0.1,0x501,1281,8,Driver Set Speed,IN USE,IN USE,IN USE,Driver Set Current,IN USE,IN USE,IN USE,10.00,80.00,2*float,<ff,"struct canData {
+	float DriverSetSpeed;
+	float DriverSetCurrent;
+}",,SpeedValCurrVal,DriverControls,DriverSetSpeed,-,-,-,DriverSetCurrent,-,-,-,,,,,
+P,"0, maxBusCurrent",driver_controls,0.5,0x502,1282,8,Zero,-,-,-,Max Bus Current,IN USE,IN USE,IN USE,2.00,16.00,2*float,<ff,"struct canData {
+	float Zero;
+	float MaxBusCurrent;
+}",,Maxbuscurrent,DriverControls,Zero,-,-,-,MaxBusCurrent,-,-,-,,,,,
+P,Identification Info,Tritium,1,0x600,1536,8,Serial Number,IN USE,IN USE,IN USE,Tritium ID,IN USE,IN USE,IN USE,1.00,8.00,"uint32, uint32",<II,"struct canData {
+	uint32_t SerialNumber;
+	uint32_t TritiumId;
+}",,IdentificationInfo,Tritium,SerialNumber,-,-,-,TritiumId,-,-,-,,,,,
+Y,Staus Information,Tritium,0.2,0x601,1537,8,Active Motor,IN USE,Error Flags,IN USE,Limit Flags,IN USE,Reserved,IN USE,5.00,40.00,4*uint16,<HHHH,"struct canData {
+	uint16_t ActiveMotor;
+	uint16_t ErrorFlags;
+	uint16_t LimitFlags;
+	uint16_t Reserved;
+}",,StausInformation,Tritium,ActiveMotor,-,ErrorFlags,-,LimitFlags,-,Reserved,-,,,,,
+Y,Bus Measurement,Tritium,0.2,0x602,1538,8,Bus Current,IN USE,IN USE,IN USE,Bus Voltage,IN USE,IN USE,IN USE,5.00,40.00,2*float,<ff,"struct canData {
+	float BusCurrent;
+	float BusVoltage;
+}",,BusMeasurement,Tritium,BusCurrent,-,-,-,BusVoltage,-,-,-,,,,,
+Y,Velocity (m/s + rpm),Tritium,0.2,0x603,1539,8,Vehicle Velocity,IN USE,IN USE,IN USE,Motor Velocity,IN USE,IN USE,IN USE,5.00,40.00,2*float,<ff,"struct canData {
+	float VehicleVelocity;
+	float MotorVelocity;
+}",,Velocity,Tritium,VehicleVelocity,-,-,-,MotorVelocity,-,-,-,,,,,
+Y,Phase Current,Tritium,0.2,0x604,1540,8,Phase A Current,IN USE,IN USE,IN USE,Phase B Current,IN USE,IN USE,IN USE,5.00,40.00,2*float,<ff,"struct canData {
+	float PhaseACurrent;
+	float PhaseBCurrent;
+}",,PhaseCurrent,Tritium,PhaseACurrent,-,-,-,PhaseBCurrent,-,-,-,,,,,
+Y,Motor Voltage Vector,Tritium,0.2,0x605,1541,8,Vect Volt Real,IN USE,IN USE,IN USE,Vect Volt Imag,IN USE,IN USE,IN USE,5.00,40.00,2*float,<ff,"struct canData {
+	float VectVoltReal;
+	float VectVoltImag;
+}",,MotorVoltageVector,Tritium,VectVoltReal,-,-,-,VectVoltImag,-,-,-,,,,,
+Y,Motor Current Vector,Tritium,0.2,0x606,1542,8,Vect Curr Real,IN USE,IN USE,IN USE,Vect Curr Imag,IN USE,IN USE,IN USE,5.00,40.00,2*float,<ff,"struct canData {
+	float VectCurrReal;
+	float VectCurrImag;
+}",,MotorCurrentVector,Tritium,VectCurrReal,-,-,-,VectCurrImag,-,-,-,,,,,
+Y,Motor BackEMF Vector,Tritium,0.2,0x607,1543,8,Back EMF Real,IN USE,IN USE,IN USE,Back EMF Imag,IN USE,IN USE,IN USE,5.00,40.00,2*float,<ff,"struct canData {
+	float BackEmfReal;
+	float BackEmfImag;
+}",,MotorBackemfVector,Tritium,BackEmfReal,-,-,-,BackEmfImag,-,-,-,,,,,
+P,15 & 1.65 Volt. Rail,Tritium,1,0x608,1544,8,Fifteen V Supply,IN USE,IN USE,IN USE,One Sixfive V Supply,IN USE,IN USE,IN USE,1.00,8.00,2*float,<ff,"struct canData {
+	float FifteenVSupply;
+	float OneSixfiveVSupply;
+}",,Rail_15VAnd1_65V,Tritium,FifteenVSupply,-,-,-,OneSixfiveVSupply,-,-,-,,,,,
+N,2.5 & 1.2 Volt. Rail,Tritium,1,0x609,1545,8,Two Five V Supply,IN USE,IN USE,IN USE,One Two V Supply,IN USE,IN USE,IN USE,1.00,8.00,2*float,<ff,"struct canData {
+	float TwoFiveVSupply;
+	float OneTwoVSupply;
+}",,Rail_2_5VAnd1_2V,Tritium,TwoFiveVSupply,-,-,-,OneTwoVSupply,-,-,-,,,,,
+N,Fan Speed Measurement,Tritium,1,0x60A,1546,8,Fan Speed,IN USE,IN USE,IN USE,Fan Drive,IN USE,IN USE,IN USE,1.00,8.00,2*float,<ff,"struct canData {
+	float FanSpeed;
+	float FanDrive;
+}",,FanSpeedMeasurement,Tritium,FanSpeed,-,-,-,FanDrive,-,-,-,,,,,
+N,Sink & Motor Temperature,Tritium,1,0x60B,1547,8,Heat Sink Temp,IN USE,IN USE,IN USE,Motor Temp,IN USE,IN USE,IN USE,1.00,8.00,2*float,<ff,"struct canData {
+	float HeatSinkTemp;
+	float MotorTemp;
+}",,SinkMotorTemperature,Tritium,HeatSinkTemp,-,-,-,MotorTemp,-,-,-,,,,,
+N,Air In & CPU Temperature,Tritium,5,0x60C,1548,8,Air Inlet Temp,IN USE,IN USE,IN USE,Processor Temp,IN USE,IN USE,IN USE,0.20,1.60,2*float,<ff,"struct canData {
+	float AirInletTemp;
+	float ProcessorTemp;
+}",,AirInCpuTemperature,Tritium,AirInletTemp,-,-,-,ProcessorTemp,-,-,-,,,,,
+N,Air Out & Cap Temperature,Tritium,5,0x60D,1549,8,Air Outlet Temp,IN USE,IN USE,IN USE,Capacitor Temp,IN USE,IN USE,IN USE,0.20,1.60,2*float,<ff,"struct canData {
+	float AirOutletTemp;
+	float CapacitorTemp;
+}",,AirOutCapTemperature,Tritium,AirOutletTemp,-,-,-,CapacitorTemp,-,-,-,,,,,
+Y,Odo. & Bus AmpHours,Tritium,1,0x60E,1550,8,DC Bus Amp Hours,IN USE,IN USE,IN USE,Odometer,IN USE,IN USE,IN USE,1.00,8.00,2*float,<ff,"struct canData {
+	float DcBusAmpHours;
+	float Odometer;
+}",,OdoBusAmphours,Tritium,DcBusAmpHours,-,-,-,Odometer,-,-,-,,,,,
+Y,cell voltages,BMS,0.104,0x700,1792,6,High Cell Voltage,IN USE,Low Cell Voltage,IN USE,Avg Cell Voltage,IN USE,-,-,9.62,57.69,3*uint16,<HHH,"struct canData {
+	uint16_t HighCellVoltage;
+	uint16_t LowCellVoltage;
+	uint16_t AvgCellVoltage;
+}",,CellVoltages,Bms,HighCellVoltage,-,LowCellVoltage,-,AvgCellVoltage,-,-,-,,,,,
+Y,"cell temps, discharge & chage current limit",BMS,0.104,0x701,1793,6,High Temperature,Low Temperature,Average Temperature,Pack DCL,Pack CCL,Current Limit…,-,-,9.62,57.69,6*int8,<bbbbbb,"struct canData {
+	int8_t HighTemperature;
+	int8_t LowTemperature;
+	int8_t AverageTemperature;
+	int8_t PackDcl;
+	int8_t PackCcl;
+	int8_t CurrentLimit;
+}",,CellTempsDischargeChageCurrentLimit,Bms,HighTemperature,LowTemperature,AverageTemperature,PackDcl,PackCcl,CurrentLimit,-,-,,,,,
+Y,BMS Message,BMS,0.104,0x702,1794,8,Pack Current,IN USE,Pack Inst. Voltage,IN USE,Pack SumV,IN USE,Pack SOC,Relay State,9.62,76.92,"int16, 2*uint16, 2*uint8",<hHHBB,"struct canData {
+	int16_t PackCurrent;
+	uint16_t PackInstVoltage;
+	uint16_t PackSumv;
+	uint8_t PackSoc;
+	uint8_t RelayState;
+}",,BmsMessage,Bms,PackCurrent,-,PackInstVoltage,-,PackSumv,-,PackSoc,RelayState,,,,,
+END,<- Needed to tell translator where final row is,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+P,MPPT poll javed,Telemetry,,0x711,1809,8,0,0,0,0,0,0,0,0,,,empty,,,,,,,,,,,,,,,,,,
+P,MPPT poll woof,Telemetry,,0x712,1810,8,0,0,0,0,0,0,0,0,,,empty,,,,,,,,,,,,,,,,,,
+P,Maybe MPPT?,MPPT_javed,,0x771,1905,7,,,,,,,,,,,4*bit & 2*bit & 2*bit & u_int8_t,,,,,,,,,,,,,,,,,,
+P,Maybe MPPT?,MPPT_woof,,0x772,1906,7,,,,,,,,,,,,,"NOTE: structure for ""0, maxBusCurrent"" was uint32, char[4]",,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Suggested format for custom CAN code,,,,,,"ok = 0xFF, not ok = 0x0A",2*float just placeholder type for testing. Needs to be changed,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Version Check,Telemetry,,0x110,,,Source and name were same for 2 records and were causing errors,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,System status,Telemetry,,0x111,,,NOTE: devices should use little endian. Checked tritium does (in doc 18.1.4 https://tritiumcharging.com/wp-content/uploads/2020/11/TritiumWaveSculptor22_Manual.pdf),,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Version Check,Driver Controls,,0x500,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,System status?,Driver Controls,,0x501,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,Identification info,Tritium,,0x600,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,System status,Tritium,,0x601,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
