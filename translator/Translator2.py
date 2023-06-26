@@ -72,7 +72,7 @@ if(headerFile != ''):
 
         headerStream.write(" __attribute__((aligned(8)));\n")
         headerStream.write("\t\t\tcanData data;\n")
-        headerStream.write("\t\t\t_" + row[3] + "() : CANMsg(" + "CAN_ID_" + row[3] + "_" + row[2] + ", " + "CAN_DLC_" + row[3] + "_" + row[2] + ") { }\n")
+        headerStream.write("\t\t\t_" + row[2] + "() : CANMsg(" + "CAN_ID_" + row[3] + "_" + row[2] + ", " + "CAN_DLC_" + row[3] + "_" + row[2] + ") { }\n")
         headerStream.write("\t\t};\n\t}\n")
         headerStream.write("\tvoid processMessage(" + row[3] + '::_' + row[2] + "& msg);\n")
         headerStream.write("#endif\n")
