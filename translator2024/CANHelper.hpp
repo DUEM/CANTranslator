@@ -13,8 +13,10 @@ namespace CANHelper
         union CANReadBuffer //to try and reduce memory copies (waste of instructions)
         {
             can_frame messageReadBuffer;
-            char padding[offsetof(can_frame, can_frame.data)]; //aligns messageReadPayloadBuffer with can_frame.data (without memcpy)
-		    Messages::CastedCANPayload messageReadPayloadBuffer;
+            struct {
+                char padding[offsetof(can_frame, can_frame.data)]; //aligns messageReadPayloadBuffer with can_frame.data (without memcpy)
+		        Messages::CastedCANPayload messageReadPayloadBuffer;
+            };
         };
         
 	protected:
