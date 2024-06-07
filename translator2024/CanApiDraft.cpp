@@ -1,3 +1,4 @@
+//Draft of the format of what will be the generated API implementation
 #include "CANHelper.hpp"
 namespace CANHelper
 { //Each USE_MSG macro has a 2 bit value. MSB is read enable (adds processMessage definition), LSB is write enable (adds struct only)

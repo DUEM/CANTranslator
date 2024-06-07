@@ -1,3 +1,4 @@
+//Draft of the format of what will be the generated API header
 #ifndef CanApiv04_INCLUDE_GUARD
 #define CanApiv04_INCLUDE_GUARD
 #include "mcp2515.h" //for certain datatypes used in this file
