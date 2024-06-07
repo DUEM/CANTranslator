@@ -7,7 +7,7 @@ namespace CANHelper::Messages //union containing all messages is at bottom
 #ifdef USE_MSG_Telemetry_TimeAndFix
 #define CAN_ID_Telemetry_TimeAndFix 0x0F6
 #define CAN_DLC_Telemetry_TimeAndFix 8
-	struct Telemetry::_TimeAndFix {
+	struct Telemetry::_TimeAndFix { //Python code will remove underscores from item names (just havnt changed them here)
 		uint8_t GpsHour;
 		uint8_t GpsMinute;
 		uint8_t GpsSeconds;
@@ -37,13 +37,13 @@ namespace CANHelper::Messages //union containing all messages is at bottom
 	union CastedCANPayload
     {
 		__u8 data[CAN_MAX_DLEN] __attribute__((aligned(8))); //generic buffer
-#ifdef USE_MSG_Telemetry_TimeAndFix
+#ifdef USE_MSG_Telemetry_TimeAndFix && (USE_MSG_Telemetry_TimeAndFix & 0b01 == 1)
         Telemetry::_TimeAndFix as_Telemetry_TimeAndFix;
 #endif
-#ifdef USE_MSG_Telemetry_SpeedAndAngle
+#ifdef USE_MSG_Telemetry_SpeedAndAngle && (USE_MSG_Telemetry_SpeedAndAngle & 0b01 == 1)
 		Telemetry::_SpeedAndAngle as_Telemetry_SpeedAndAngle;
 #endif
-#ifdef USE_MSG_Telemetry_Latitude
+#ifdef USE_MSG_Telemetry_Latitude && (USE_MSG_Telemetry_Latitude & 0b01 == 1)
 		Telemetry::_Latitude as_Telemetry_Latitude;
 #endif
     };
@@ -69,14 +69,14 @@ namespace CANHelper {
 #ifdef PROCESS_ALL_MSG
 		void processAll(Messages::CastedCANPayload& msg);
 #endif
-#ifdef USE_MSG_Telemetry_TimeAndFix
-		void processMessage(Messages::Telemetry::_TimeAndFix& msg);
+#if defined(USE_MSG_Telemetry_TimeAndFix) && (USE_MSG_Telemetry_TimeAndFix & 0b10 == 2)
+		void processMessage(Messages::Telemetry::TimeAndFix& msg);
 #endif
-#ifdef USE_MSG_Telemetry_SpeedAndAngle
-		void processMessage(Messages::Telemetry::_SpeedAndAngle& msg);
+#if defined(USE_MSG_Telemetry_SpeedAndAngle) && (USE_MSG_Telemetry_SpeedAndAngle & 0b10 == 2)
+		void processMessage(Messages::Telemetry::SpeedAndAngle& msg);
 #endif
-#ifdef USE_MSG_Telemetry_Latitude
-		void processMessage(Messages::Telemetry::_Latitude& msg);
+#if defined(USE_MSG_Telemetry_Latitude) && (USE_MSG_Telemetry_Latitude & 0b10 == 2)
+		void processMessage(Messages::Telemetry::Latitude& msg);
 #endif
 	};
 }

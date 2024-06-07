@@ -4,6 +4,7 @@
 #define LATEST_MSG_ID this->messageRead.raw.can_id //NOTE: only can be used in member functions of CanMsgHandlerBase and CanMsgHander
                                                 //(which extends CanMsgHandlerBase). This includes all the processMessage functions
 #define LATEST_MSG_ID this->messageRead.raw.can_dlc
+#define LATEST_MSG_DATA this->messageRead.payloadBuffer
 
 namespace CANHelper {
 	class CANHandler : CanMsgHandler {   
