@@ -43,7 +43,7 @@ if(headerFile != ''):
     headerStream.write("#include \"CANHelper.hpp\"\n")
     #headerStream.write("namespace CANHelper\n{\n\tvoid DispatchMsg(can_frame msg);\n}\n")
     headerStream.write("namespace CANHelper::Messages {\n")
-    implStream.write('#include \"' + os.path.basename(headerFile) + '.hpp\"\nnamespace CANHelper\n{\n\tvoid CanMsgHandler::DispatchMsg()\n\t{\n\t\tswitch(LATEST_MSG_ID)\n\t\t{\n')
+    implStream.write('#include \"' + os.path.basename(headerFile) + '.hpp\"\nnamespace CANHelper {\n\tvoid CanMsgHandler::DispatchMsg() {\n\t\tswitch(LATEST_MSG_ID) {\n')
 
     rowNumber = 2
     while not (str(sheet[rowNumber][0].value) == "END"):
@@ -68,18 +68,18 @@ if(headerFile != ''):
         headerStream.write(structString)
         headerStream.write("#endif\n")
 
-        implStream.write("#ifdef USE_MSG_" + fullName + " && (USE_MSG_" + fullName + " & 0b10 == 2)\n")
+        implStream.write("#if defined(USE_MSG_" + fullName + ") && (USE_MSG_" + fullName + " & 0b10 == 2)\n")
         implStream.write('\t\tcase ' + id + ':\n')
         implStream.write("\t\t\tCanMsgHandler::processMessage(LATEST_MSG_DATA.as_" + fullName + ");\n")
         implStream.write("\t\t\tbreak;\n")
         implStream.write("#endif\n")
 
-        processMsgDeclarationsStream.write("#ifdef USE_MSG_" + fullName + " && (USE_MSG_" + fullName + " & 0b10 == 2)\n")
+        processMsgDeclarationsStream.write("#if defined(USE_MSG_" + fullName + ") && (USE_MSG_" + fullName + " & 0b10 == 2)\n")
         processMsgDeclarationsStream.write("\t\tvoid processMessage(Messages::" + row[3] + "::" + row[2] + "& msg);\n")
         processMsgDeclarationsStream.write("#endif\n")
 
-        unionDeclarationStream.write("#ifdef USE_MSG_" + fullName + " && (USE_MSG_" + fullName + " & 0b01 == 1)\n")
-        unionDeclarationStream.write(row[3] + "::" + row[2] + "as_" + fullName + ";")
+        unionDeclarationStream.write("#if defined(USE_MSG_" + fullName + ") && (USE_MSG_" + fullName + " & 0b01 == 1)\n")
+        unionDeclarationStream.write("\t\t" + row[3] + "::" + row[2] + " as_" + fullName + ";\n")
         unionDeclarationStream.write("#endif\n")
 
     #process all message declaration
@@ -88,12 +88,11 @@ if(headerFile != ''):
     processMsgDeclarationsStream.write("#endif\n")
 
     #add union
+    headerStream.write("\tunion CastedCANPayload {\n" + unionDeclarationStream.getvalue() + "\t};\n")
     unionDeclarationStream.close()
-    headerStream.write("union CastedCANPayload {" + unionDeclarationStream.getvalue() + "};")
     headerStream.write("}\n") #close Messages namespace
 
     #add helper buffer union and MsgHandler class
-    processMsgDeclarationsStream.close()
     headerStream.write(""" namespace CANHelper {
 	union CANHelperBuffer { //to try and reduce memory copies (waste of instructions)
 		can_frame raw;
@@ -107,8 +106,9 @@ if(headerFile != ''):
 	protected:
 		CANHelperBuffer messageRead; //holds the latest received message from the CAN bus
 	public:
-		CanMsgHandler() = default;""")
+		CanMsgHandler() = default;\n""")
     headerStream.write(processMsgDeclarationsStream.getvalue())
+    processMsgDeclarationsStream.close()
     headerStream.write("\t};\n}\n") #close off class and then namespace
 
     #close header namespace and stream
@@ -117,7 +117,7 @@ if(headerFile != ''):
 
     implStream.write("\t\t}\n")
     implStream.write("#ifdef PROCESS_ALL_MSG\n")
-    implStream.write("\t\tprocessAll((Messages::CastedCANPayload&) msg);\n")
+    implStream.write("\t\tprocessAll(LATEST_MSG_DATA);\n")
     implStream.write("#endif\n")
     implStream.write("\t}\n}\n")
     implStream.close()
