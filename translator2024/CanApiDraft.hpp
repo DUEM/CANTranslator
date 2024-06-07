@@ -1,6 +1,6 @@
 #ifndef CanApiv04_INCLUDE_GUARD
 #define CanApiv04_INCLUDE_GUARD
-#include "mcp2515.h"
+#include "mcp2515.h" //for certain datatypes used in this file
 
 namespace CANHelper::Messages //union containing all messages is at bottom
 {
@@ -36,7 +36,7 @@ namespace CANHelper::Messages //union containing all messages is at bottom
 #endif
 	union CastedCANPayload
     {
-		__u8 data[CAN_MAX_DLEN] __attribute__((aligned(8))); //generic buffer (for processAll()) (Note type __u8& to avoid extra memcpy between messageRead and this union)
+		__u8 data[CAN_MAX_DLEN] __attribute__((aligned(8))); //generic buffer
 #ifdef USE_MSG_Telemetry_TimeAndFix
         Telemetry::_TimeAndFix as_Telemetry_TimeAndFix;
 #endif
@@ -50,17 +50,24 @@ namespace CANHelper::Messages //union containing all messages is at bottom
 }
 #endif
 
-namespace CANHelper
-{
-	class CanMsgHandler
-	{
+namespace CANHelper {
+	union CANHelperBuffer { //to try and reduce memory copies (waste of instructions)
+		can_frame raw;
+		struct {
+			char padding[offsetof(can_frame, can_frame.data)]; //aligns payloadBuffer with can_frame.data (without memcpy)
+			Messages::CastedCANPayload payloadBuffer;
+		};
+	};
+	
+	class CanMsgHandler {
+	protected:
+		CANHelperBuffer messageRead; //holds the latest received message from the CAN bus
 	public:
-		//CanMsgHandler(int CSPin, CAN_SPEED canSpeed) : CanMsgHandlerBase(CSPin, canSpeed) {}
 		CanMsgHandler() = default;
 
         //all processMessage functions go here
 #ifdef PROCESS_ALL_MSG
-		void processAll(CANMsg& msg);
+		void processAll(Messages::CastedCANPayload& msg);
 #endif
 #ifdef USE_MSG_Telemetry_TimeAndFix
 		void processMessage(Messages::Telemetry::_TimeAndFix& msg);
