@@ -112,7 +112,7 @@ if(headerFile != ''):
     headerStream.write("\t};\n}\n") #close off class and then namespace
 
     #close header namespace and stream
-    headerStream.write("#endif") #close off include guard
+    headerStream.write("#endif\n") #close off include guard
     headerStream.close()
 
     implStream.write("\t\t}\n")
