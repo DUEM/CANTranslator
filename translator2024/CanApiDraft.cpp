@@ -23,7 +23,7 @@ namespace CANHelper
 #endif
 		}
 #ifdef PROCESS_ALL_MSG
-		processAll((Messages::CastedCANPayload&) msg);
+		processAll(LATEST_MSG);
 #endif
 	}
 }

@@ -5,6 +5,7 @@
                                                 //(which extends CanMsgHandlerBase). This includes all the processMessage functions
 #define LATEST_MSG_ID this->messageRead.raw.can_dlc
 #define LATEST_MSG_DATA this->messageRead.payloadBuffer
+#define LATEST_MSG this->messageRead
 
 namespace CANHelper {
 	struct canMeta { //used in send functions to declare id and dlc for buffer
