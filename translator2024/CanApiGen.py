@@ -40,10 +40,11 @@ if(headerFile != ''):
 
     headerStream.write("#ifndef " + os.path.basename(headerFile) + "_INCLUDE_GUARD\n")
     headerStream.write("#define " + os.path.basename(headerFile) + "_INCLUDE_GUARD\n")
-    headerStream.write("#include \"CANHelper.hpp\"\n")
+    headerStream.write("#include \"mcp2515.h\"\n")
     #headerStream.write("namespace CANHelper\n{\n\tvoid DispatchMsg(can_frame msg);\n}\n")
     headerStream.write("namespace CANHelper::Messages {\n")
-    implStream.write('#include \"' + os.path.basename(headerFile) + '.hpp\"\nnamespace CANHelper {\n\tvoid CanMsgHandler::DispatchMsg() {\n\t\tswitch(LATEST_MSG_ID) {\n')
+    #implStream.write('#include \"' + os.path.basename(headerFile) + '.hpp\"\nnamespace CANHelper {\n\tvoid CANHandler::DispatchMsg() {\n\t\tswitch(LATEST_MSG_ID) {\n')
+    implStream.write('#include \"CANHelper.hpp\"\nnamespace CANHelper {\n\tvoid CANHandler::DispatchMsg() {\n\t\tswitch(LATEST_MSG_ID) {\n')
 
     rowNumber = 2
     while not (str(sheet[rowNumber][0].value) == "END"):
@@ -60,17 +61,20 @@ if(headerFile != ''):
         headerStream.write("#ifdef USE_MSG_" + fullName + "\n")
         headerStream.write("#define CAN_ID_" + fullName + " " + str(id) + "\n")
         headerStream.write("#define CAN_DLC_" + fullName + " " + str(dlc) + "\n")
+        headerStream.write("#define CAN_META_" + fullName + " {" + str(id) + ", " + str(dlc) + "}\n")
+        headerStream.write("\tnamespace " + row[3] + " {\n")
 
-        structString: str = row[0] + " __attribute__((aligned(8)));\n"
-        structString = "\t" + structString.replace("\n", "\n\t")
+        structString: str = "\t" + row[0] + " __attribute__((aligned(8)));\n"
+        structString = "\t" + structString.replace("\n", "\n\t\t")
         structString = structString.replace("_x000D_", "")
 
         headerStream.write(structString)
+        headerStream.write("};\n")
         headerStream.write("#endif\n")
 
         implStream.write("#if defined(USE_MSG_" + fullName + ") && (USE_MSG_" + fullName + " & 0b10 == 2)\n")
         implStream.write('\t\tcase ' + id + ':\n')
-        implStream.write("\t\t\tCanMsgHandler::processMessage(LATEST_MSG_DATA.as_" + fullName + ");\n")
+        implStream.write("\t\t\tthis->processMessage(LATEST_MSG_DATA.as_" + fullName + ");\n")
         implStream.write("\t\t\tbreak;\n")
         implStream.write("#endif\n")
 
@@ -97,7 +101,7 @@ if(headerFile != ''):
 	union CANHelperBuffer { //to try and reduce memory copies (waste of instructions)
 		can_frame raw;
 		struct {
-			char padding[offsetof(can_frame, can_frame.data)]; //aligns payloadBuffer with can_frame.data (without memcpy)
+			char padding[offsetof(can_frame, data)]; //aligns payloadBuffer with can_frame.data (without memcpy)
 			Messages::CastedCANPayload payloadBuffer;
 		};
 	};

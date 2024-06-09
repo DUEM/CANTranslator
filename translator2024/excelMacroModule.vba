@@ -1,4 +1,3 @@
-'This is a backup of the macros used in the can bus config
 Public Function CamelCase(s As String) As String
     With CreateObject("VBScript.RegExp")
         .Pattern = "[^a-zA-Z]"
@@ -12,7 +11,8 @@ Public Function CStruct(structDataType As String, fields As Range, dlc As Intege
     datatypes = Split(structDataType, ",")
     
     'CStruct = "struct canData {"
-    CStruct = "struct " & Source & "::" & Item & " {"
+    'CStruct = "struct " & Source & "::" & Item & " {"
+    CStruct = "struct " & Item & " {"
     Dim dataIndex As Integer
     dataIndex = 1
     For i = 0 To UBound(datatypes())
@@ -97,3 +97,4 @@ Public Function structUnpackCode(structDataType As String, Optional endian As In
         Next j
     Next i
 End Function
+

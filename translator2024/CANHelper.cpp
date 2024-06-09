@@ -27,4 +27,9 @@ namespace CANHelper
     void CANHandler::send(can_frame& toSend) {
         this->mcp2515.sendMessage(&toSend);
     }
+
+    void CANHandler::setCanMeta(CANHelperBuffer& buffer, canMeta meta) {
+        buffer.raw.can_id = meta.can_id;
+        buffer.raw.can_dlc = meta.can_dlc;
+    }
 }

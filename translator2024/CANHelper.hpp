@@ -7,7 +7,12 @@
 #define LATEST_MSG_DATA this->messageRead.payloadBuffer
 
 namespace CANHelper {
-	class CANHandler : CanMsgHandler {   
+	struct canMeta { //used in send functions to declare id and dlc for buffer
+        canid_t can_id;
+        __u8    can_dlc;
+    };
+
+	class CANHandler : public CanMsgHandler {   
 	private:
 		MCP2515 mcp2515;
 	public:
@@ -16,6 +21,7 @@ namespace CANHelper {
         void testRead(can_frame& testFrame);
 		void send(CANHelperBuffer& toSend);
         void send(can_frame& toSend);
+		void setCanMeta(CANHelperBuffer& buffer, canMeta meta);
         void DispatchMsg(); //internal function to cast and handle data
 	};
 }
