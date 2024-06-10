@@ -67,12 +67,12 @@ Public Function CStruct(structDataType As String, fields As Range, dlc As Intege
     
 End Function
 
-Public Function structUnpackCode(structDataType As String, Optional endian As Integer = 0) 'endian = 0 for little, endian = 1 for big
+Public Function structUnpackCode(structDataType As String, Optional endian As String = "little")
     Dim datatypes() As String
     datatypes = Split(structDataType, ",")
     
     'Dim structUnpackCode As String
-    structUnpackCode = IIf(endian = 1, ">", "<")
+    structUnpackCode = IIf(LCase(endian) = "big", ">", "<")
     For i = 0 To UBound(datatypes())
         Dim temp() As String
         temp = Split(Replace(datatypes(i), " ", ""), "*")

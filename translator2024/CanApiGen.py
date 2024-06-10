@@ -48,7 +48,8 @@ if(headerFile != ''):
 
     rowNumber = 2
     while not (str(sheet[rowNumber][0].value) == "END"):
-        row = [cell.value for cell in sheet[rowNumber][19:]]
+        row = [cell.value for cell in sheet[rowNumber][20:]] #where 20 is index of c struct column (second grey column)
+        endianness = sheet[rowNumber][18].value
         id = sheet[rowNumber][4].value
         dlc = sheet[rowNumber][6].value
         rowNumber = rowNumber + 1
@@ -71,9 +72,11 @@ if(headerFile != ''):
         headerStream.write(structString)
         headerStream.write("};\n")
         headerStream.write("#endif\n")
-
+        
         implStream.write("#if defined(USE_MSG_" + fullName + ") && ((USE_MSG_" + fullName + " & 0b10) == 2)\n")
         implStream.write('\t\tcase ' + id + ':\n')
+        if sub(r"[^a-zA-Z0–9]","",endianness) == 'BIG':
+            implStream.write("\t\t\tthis->reverseBytes(LATEST_MSG);\n")
         implStream.write("\t\t\tthis->processMessage(LATEST_MSG_DATA.as_" + fullName + ");\n")
         implStream.write("\t\t\tbreak;\n")
         implStream.write("#endif\n")
@@ -82,7 +85,8 @@ if(headerFile != ''):
         processMsgDeclarationsStream.write("\t\tvoid processMessage(Messages::" + row[3] + "::" + row[2] + "& msg);\n")
         processMsgDeclarationsStream.write("#endif\n")
 
-        unionDeclarationStream.write("#if defined(USE_MSG_" + fullName + ") && ((USE_MSG_" + fullName + " & 0b01) == 1)\n")
+        #unionDeclarationStream.write("#if defined(USE_MSG_" + fullName + ") && ((USE_MSG_" + fullName + " & 0b01) == 1)\n")
+        unionDeclarationStream.write("#if defined(USE_MSG_" + fullName + ")\n")
         unionDeclarationStream.write("\t\t" + row[3] + "::" + row[2] + " as_" + fullName + ";\n")
         unionDeclarationStream.write("#endif\n")
 
