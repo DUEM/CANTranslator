@@ -8,7 +8,7 @@ namespace CANHelper::Messages //union containing all messages is at bottom
 #ifdef USE_MSG_Telemetry_TimeAndFix
 #define CAN_ID_Telemetry_TimeAndFix 0x0F6
 #define CAN_DLC_Telemetry_TimeAndFix 8
-	struct Telemetry::TimeAndFix { //Python code will remove underscores from item names (just havnt changed them here)
+	struct Telemetry::TimeAndFix {
 		uint8_t GpsHour;
 		uint8_t GpsMinute;
 		uint8_t GpsSeconds;
