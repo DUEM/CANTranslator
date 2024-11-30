@@ -1,3 +1,6 @@
 #ignore temporary excel file created when excel is open
 ~$*
 **/~$*
+
+#Mac Finder Metadata
+.DS_Store
