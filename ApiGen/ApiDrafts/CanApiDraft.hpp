@@ -8,7 +8,7 @@ namespace CANHelper::Messages //union containing all messages is at bottom
 #ifdef USE_MSG_Telemetry_TimeAndFix
 #define CAN_ID_Telemetry_TimeAndFix 0x0F6
 #define CAN_DLC_Telemetry_TimeAndFix 8
-	struct Telemetry::_TimeAndFix { //Python code will remove underscores from item names (just havnt changed them here)
+	struct Telemetry::TimeAndFix { //Python code will remove underscores from item names (just havnt changed them here)
 		uint8_t GpsHour;
 		uint8_t GpsMinute;
 		uint8_t GpsSeconds;
@@ -22,7 +22,7 @@ namespace CANHelper::Messages //union containing all messages is at bottom
 #ifdef USE_MSG_Telemetry_SpeedAndAngle
 #define CAN_ID_Telemetry_SpeedAndAngle 0x0F7
 #define CAN_DLC_Telemetry_SpeedAndAngle 8
-	struct Telemetry::_SpeedAndAngle {
+	struct Telemetry::SpeedAndAngle {
 		float GpsSpeed;
 		float GpsAngle;
 	} __attribute__((aligned(8)));
@@ -30,7 +30,7 @@ namespace CANHelper::Messages //union containing all messages is at bottom
 #ifdef USE_MSG_Telemetry_Latitude
 #define CAN_ID_Telemetry_Latitude 0x0F8
 #define CAN_DLC_Telemetry_Latitude 5
-	struct Telemetry::_Latitude {
+	struct Telemetry::Latitude {
 		float GpsLatitude;
 		char GpsLat;
 	} __attribute__((aligned(8)));
