@@ -101,7 +101,7 @@ if(headerFile != ''):
     headerStream.write("}\n") #close Messages namespace
 
     #add helper buffer union and MsgHandler class
-    headerStream.write(""" namespace CANHelper {
+    headerStream.write("""namespace CANHelper {
 	union CANHelperBuffer { //to try and reduce memory copies (waste of instructions)
 		can_frame raw;
 		struct {
