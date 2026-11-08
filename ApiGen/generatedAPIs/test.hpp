@@ -491,97 +491,97 @@ namespace CANHelper {
 		CANHelperBuffer messageRead; //holds the latest received message from the CAN bus
 	public:
 		CanMsgHandler() = default;
-#if defined(USE_MSG_Telemetry_TimeAndFix) && ((USE_MSG_Telemetry_TimeAndFix & 0b10) == 2)
+#if defined(USE_MSG_Telemetry_TimeAndFix) && (((USE_MSG_Telemetry_TimeAndFix + 0) & 0b10) == 2)
 		void processMessage(Messages::Telemetry::TimeAndFix& msg);
 #endif
-#if defined(USE_MSG_Telemetry_SpeedAndAngle) && ((USE_MSG_Telemetry_SpeedAndAngle & 0b10) == 2)
+#if defined(USE_MSG_Telemetry_SpeedAndAngle) && (((USE_MSG_Telemetry_SpeedAndAngle + 0) & 0b10) == 2)
 		void processMessage(Messages::Telemetry::SpeedAndAngle& msg);
 #endif
-#if defined(USE_MSG_Telemetry_Latitude) && ((USE_MSG_Telemetry_Latitude & 0b10) == 2)
+#if defined(USE_MSG_Telemetry_Latitude) && (((USE_MSG_Telemetry_Latitude + 0) & 0b10) == 2)
 		void processMessage(Messages::Telemetry::Latitude& msg);
 #endif
-#if defined(USE_MSG_Telemetry_Longitude) && ((USE_MSG_Telemetry_Longitude & 0b10) == 2)
+#if defined(USE_MSG_Telemetry_Longitude) && (((USE_MSG_Telemetry_Longitude + 0) & 0b10) == 2)
 		void processMessage(Messages::Telemetry::Longitude& msg);
 #endif
-#if defined(USE_MSG_Telemetry_AltitudeAndSatellites) && ((USE_MSG_Telemetry_AltitudeAndSatellites & 0b10) == 2)
+#if defined(USE_MSG_Telemetry_AltitudeAndSatellites) && (((USE_MSG_Telemetry_AltitudeAndSatellites + 0) & 0b10) == 2)
 		void processMessage(Messages::Telemetry::AltitudeAndSatellites& msg);
 #endif
-#if defined(USE_MSG_Telemetry_SystemStatusMessages) && ((USE_MSG_Telemetry_SystemStatusMessages & 0b10) == 2)
+#if defined(USE_MSG_Telemetry_SystemStatusMessages) && (((USE_MSG_Telemetry_SystemStatusMessages + 0) & 0b10) == 2)
 		void processMessage(Messages::Telemetry::SystemStatusMessages& msg);
 #endif
-#if defined(USE_MSG_DriverControls_SpeedValCurrVal) && ((USE_MSG_DriverControls_SpeedValCurrVal & 0b10) == 2)
+#if defined(USE_MSG_DriverControls_SpeedValCurrVal) && (((USE_MSG_DriverControls_SpeedValCurrVal + 0) & 0b10) == 2)
 		void processMessage(Messages::DriverControls::SpeedValCurrVal& msg);
 #endif
-#if defined(USE_MSG_DriverControls_Maxbuscurrent) && ((USE_MSG_DriverControls_Maxbuscurrent & 0b10) == 2)
+#if defined(USE_MSG_DriverControls_Maxbuscurrent) && (((USE_MSG_DriverControls_Maxbuscurrent + 0) & 0b10) == 2)
 		void processMessage(Messages::DriverControls::Maxbuscurrent& msg);
 #endif
-#if defined(USE_MSG_Tritium_IdentificationInfo) && ((USE_MSG_Tritium_IdentificationInfo & 0b10) == 2)
+#if defined(USE_MSG_Tritium_IdentificationInfo) && (((USE_MSG_Tritium_IdentificationInfo + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::IdentificationInfo& msg);
 #endif
-#if defined(USE_MSG_Tritium_StatusInformation) && ((USE_MSG_Tritium_StatusInformation & 0b10) == 2)
+#if defined(USE_MSG_Tritium_StatusInformation) && (((USE_MSG_Tritium_StatusInformation + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::StatusInformation& msg);
 #endif
-#if defined(USE_MSG_Tritium_BusMeasurement) && ((USE_MSG_Tritium_BusMeasurement & 0b10) == 2)
+#if defined(USE_MSG_Tritium_BusMeasurement) && (((USE_MSG_Tritium_BusMeasurement + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::BusMeasurement& msg);
 #endif
-#if defined(USE_MSG_Tritium_Velocity) && ((USE_MSG_Tritium_Velocity & 0b10) == 2)
+#if defined(USE_MSG_Tritium_Velocity) && (((USE_MSG_Tritium_Velocity + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::Velocity& msg);
 #endif
-#if defined(USE_MSG_Tritium_PhaseCurrent) && ((USE_MSG_Tritium_PhaseCurrent & 0b10) == 2)
+#if defined(USE_MSG_Tritium_PhaseCurrent) && (((USE_MSG_Tritium_PhaseCurrent + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::PhaseCurrent& msg);
 #endif
-#if defined(USE_MSG_Tritium_MotorVoltageVector) && ((USE_MSG_Tritium_MotorVoltageVector & 0b10) == 2)
+#if defined(USE_MSG_Tritium_MotorVoltageVector) && (((USE_MSG_Tritium_MotorVoltageVector + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::MotorVoltageVector& msg);
 #endif
-#if defined(USE_MSG_Tritium_MotorCurrentVector) && ((USE_MSG_Tritium_MotorCurrentVector & 0b10) == 2)
+#if defined(USE_MSG_Tritium_MotorCurrentVector) && (((USE_MSG_Tritium_MotorCurrentVector + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::MotorCurrentVector& msg);
 #endif
-#if defined(USE_MSG_Tritium_MotorBackemfVector) && ((USE_MSG_Tritium_MotorBackemfVector & 0b10) == 2)
+#if defined(USE_MSG_Tritium_MotorBackemfVector) && (((USE_MSG_Tritium_MotorBackemfVector + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::MotorBackemfVector& msg);
 #endif
-#if defined(USE_MSG_Tritium_Rail_15V) && ((USE_MSG_Tritium_Rail_15V & 0b10) == 2)
+#if defined(USE_MSG_Tritium_Rail_15V) && (((USE_MSG_Tritium_Rail_15V + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::Rail_15V& msg);
 #endif
-#if defined(USE_MSG_Tritium_Rail_3_3VAnd1_9V) && ((USE_MSG_Tritium_Rail_3_3VAnd1_9V & 0b10) == 2)
+#if defined(USE_MSG_Tritium_Rail_3_3VAnd1_9V) && (((USE_MSG_Tritium_Rail_3_3VAnd1_9V + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::Rail_3_3VAnd1_9V& msg);
 #endif
-#if defined(USE_MSG_Tritium_SinkMotorTemperature) && ((USE_MSG_Tritium_SinkMotorTemperature & 0b10) == 2)
+#if defined(USE_MSG_Tritium_SinkMotorTemperature) && (((USE_MSG_Tritium_SinkMotorTemperature + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::SinkMotorTemperature& msg);
 #endif
-#if defined(USE_MSG_Tritium_DspBoardTemperature) && ((USE_MSG_Tritium_DspBoardTemperature & 0b10) == 2)
+#if defined(USE_MSG_Tritium_DspBoardTemperature) && (((USE_MSG_Tritium_DspBoardTemperature + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::DspBoardTemperature& msg);
 #endif
-#if defined(USE_MSG_Tritium_OdoBusAmphours) && ((USE_MSG_Tritium_OdoBusAmphours & 0b10) == 2)
+#if defined(USE_MSG_Tritium_OdoBusAmphours) && (((USE_MSG_Tritium_OdoBusAmphours + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::OdoBusAmphours& msg);
 #endif
-#if defined(USE_MSG_Tritium_SlipSpeedMeasurement) && ((USE_MSG_Tritium_SlipSpeedMeasurement & 0b10) == 2)
+#if defined(USE_MSG_Tritium_SlipSpeedMeasurement) && (((USE_MSG_Tritium_SlipSpeedMeasurement + 0) & 0b10) == 2)
 		void processMessage(Messages::Tritium::SlipSpeedMeasurement& msg);
 #endif
-#if defined(USE_MSG_Orion_PackParametersDefaultId) && ((USE_MSG_Orion_PackParametersDefaultId & 0b10) == 2)
+#if defined(USE_MSG_Orion_PackParametersDefaultId) && (((USE_MSG_Orion_PackParametersDefaultId + 0) & 0b10) == 2)
 		void processMessage(Messages::Orion::PackParametersDefaultId& msg);
 #endif
-#if defined(USE_MSG_Orion_CellTempsDclDefaultId) && ((USE_MSG_Orion_CellTempsDclDefaultId & 0b10) == 2)
+#if defined(USE_MSG_Orion_CellTempsDclDefaultId) && (((USE_MSG_Orion_CellTempsDclDefaultId + 0) & 0b10) == 2)
 		void processMessage(Messages::Orion::CellTempsDclDefaultId& msg);
 #endif
-#if defined(USE_MSG_Orion_PackParameters) && ((USE_MSG_Orion_PackParameters & 0b10) == 2)
+#if defined(USE_MSG_Orion_PackParameters) && (((USE_MSG_Orion_PackParameters + 0) & 0b10) == 2)
 		void processMessage(Messages::Orion::PackParameters& msg);
 #endif
-#if defined(USE_MSG_Orion_CellTempsDcl) && ((USE_MSG_Orion_CellTempsDcl & 0b10) == 2)
+#if defined(USE_MSG_Orion_CellTempsDcl) && (((USE_MSG_Orion_CellTempsDcl + 0) & 0b10) == 2)
 		void processMessage(Messages::Orion::CellTempsDcl& msg);
 #endif
-#if defined(USE_MSG_Orion_CellVoltages) && ((USE_MSG_Orion_CellVoltages & 0b10) == 2)
+#if defined(USE_MSG_Orion_CellVoltages) && (((USE_MSG_Orion_CellVoltages + 0) & 0b10) == 2)
 		void processMessage(Messages::Orion::CellVoltages& msg);
 #endif
-#if defined(USE_MSG_Telemetry_MpptPollJaved) && ((USE_MSG_Telemetry_MpptPollJaved & 0b10) == 2)
+#if defined(USE_MSG_Telemetry_MpptPollJaved) && (((USE_MSG_Telemetry_MpptPollJaved + 0) & 0b10) == 2)
 		void processMessage(Messages::Telemetry::MpptPollJaved& msg);
 #endif
-#if defined(USE_MSG_Telemetry_MpptPollWoof) && ((USE_MSG_Telemetry_MpptPollWoof & 0b10) == 2)
+#if defined(USE_MSG_Telemetry_MpptPollWoof) && (((USE_MSG_Telemetry_MpptPollWoof + 0) & 0b10) == 2)
 		void processMessage(Messages::Telemetry::MpptPollWoof& msg);
 #endif
-#if defined(USE_MSG_Mppt_Javed) && ((USE_MSG_Mppt_Javed & 0b10) == 2)
+#if defined(USE_MSG_Mppt_Javed) && (((USE_MSG_Mppt_Javed + 0) & 0b10) == 2)
 		void processMessage(Messages::Mppt::Javed& msg);
 #endif
-#if defined(USE_MSG_Mppt_Woof) && ((USE_MSG_Mppt_Woof & 0b10) == 2)
+#if defined(USE_MSG_Mppt_Woof) && (((USE_MSG_Mppt_Woof + 0) & 0b10) == 2)
 		void processMessage(Messages::Mppt::Woof& msg);
 #endif
 #ifdef PROCESS_ALL_MSG

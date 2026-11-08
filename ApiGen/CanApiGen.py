@@ -216,7 +216,8 @@ def read_messages(config_file):
 
 
 def read_enabled(name):
-    return "#if defined(USE_MSG_%s) && ((USE_MSG_%s & 0b10) == 2)\n" % (name, name)
+    # "+ 0" so that a USE_MSG_ macro defined with no value means struct only, instead of a compile error
+    return "#if defined(USE_MSG_%s) && (((USE_MSG_%s + 0) & 0b10) == 2)\n" % (name, name)
 
 
 def generate(messages, guard_name):
