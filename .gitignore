@@ -4,3 +4,7 @@
 
 #Mac Finder Metadata
 .DS_Store
+
+#Python and pytest caches
+__pycache__/
+.pytest_cache/
