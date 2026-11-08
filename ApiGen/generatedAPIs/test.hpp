@@ -1,3 +1,5 @@
+// GENERATED FILE: DO NOT EDIT. Written by CANTranslator (ApiGen/CanApiGen.py) from config/CANConfig.xlsm.
+// To add or change a CAN message, edit the spreadsheet and regenerate: https://github.com/DUEM/CANTranslator
 #ifndef test_INCLUDE_GUARD
 #define test_INCLUDE_GUARD
 #include "mcp2515.h"

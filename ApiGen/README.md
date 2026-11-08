@@ -9,7 +9,7 @@ The other half of CANApi, `CANHelper.hpp/.cpp`, is hand-written and lives in the
 From the top of the repository, after `pip install -r ApiGen/requirements.txt`:
 
 ```shell
-python3 ApiGen/CanApiGen.py -c config/CANConfig.xlsm -h CANApi/CanApiv10
+python3 ApiGen/CanApiGen.py -c config/CANConfig.xlsm -h CANApi/src/generated/CanApi
 ```
 
 | Option | Meaning |
@@ -18,7 +18,9 @@ python3 ApiGen/CanApiGen.py -c config/CANConfig.xlsm -h CANApi/CanApiv10
 | `-h`, `--headerStream` | Output path **without** an extension. Writes `<path>.hpp` and `<path>.cpp`, replacing any already there. (Not help.) |
 | `--help` | Show the usage |
 
-The header's include guard is named after the file (`CanApiv10_INCLUDE_GUARD`). The hand-written `CANHelper.hpp` includes `CanApiv10.hpp` by name, so **keep the name `CanApiv10`** unless you also change `CANHelper.hpp`.
+The header's include guard is named after the file (`CanApi_INCLUDE_GUARD`). The hand-written `CANApi/src/CANHelper.hpp` includes `generated/CanApi.hpp` by name, and the generated `.cpp` includes `../CANHelper.hpp`, so **always write to `CANApi/src/generated/CanApi`** unless you also change both.
+
+Both files start with a two-line `GENERATED FILE: DO NOT EDIT` notice. It has no date or commit hash, so the output only changes when the spreadsheet does.
 
 The script lists each message it generates and each row it skips, then ends with `Generated ...: 31 messages, 4 skipped`. It exits with status 1 if the spreadsheet has problems, and 2 for a usage error.
 
@@ -59,7 +61,7 @@ Before writing anything, the generator checks every row it is going to generate.
 
 In the examples below, `<Name>` stands for `<SourceCC>_<ItemCC>`, e.g. `Telemetry_TimeAndFix`.
 
-**Header (`CanApiv10.hpp`)**, for each message, only if `USE_MSG_<Name>` is defined:
+**Header (`CanApi.hpp`)**, for each message, only if `USE_MSG_<Name>` is defined:
 
 ```cpp
 #ifdef USE_MSG_Telemetry_TimeAndFix
@@ -85,7 +87,7 @@ then, after all the messages:
 | `CANHelper::CANHelperBuffer` | A union of the MCP2515 `can_frame` (`.raw`) and the payload union (`.payloadBuffer`), lined up so that `payloadBuffer` is exactly `raw.data`. Use one of these for every message you send or receive. |
 | `CANHelper::CanMsgHandler` | Base class holding the last received message (`messageRead`), with one `processMessage(Messages::<Source>::<Item>&)` declaration per message whose read bit is set, plus `processAll(CANHelperBuffer&)` if `PROCESS_ALL_MSG` is defined. |
 
-**Implementation (`CanApiv10.cpp`)**: `CANHandler::DispatchMsg()`, which is called by `CANHandler::read()` for every received frame:
+**Implementation (`CanApi.cpp`)**: `CANHandler::DispatchMsg()`, which is called by `CANHandler::read()` for every received frame:
 
 ```cpp
 switch(LATEST_MSG_ID) {
@@ -117,7 +119,7 @@ The generator only **declares** `processMessage()` and `processAll()`. The firmw
 
 ## Choosing messages (UseMsgList.hpp)
 
-`CANHelper.hpp` includes `../../UseMsgList.hpp`, i.e. a file in the sketch folder, two levels above `src/CANApi/`. It defines one macro for each message the firmware uses, with a 2-bit value:
+`CANHelper.hpp` includes `UseMsgList.hpp`: the file named by `CANAPI_CONFIG_FILE` if that is defined, otherwise `UseMsgList.hpp` on the include path, otherwise the one in the sketch folder when CANApi is a submodule at `<sketch>/src/CANApi/` (see the CANApi README). It defines one macro for each message the firmware uses, with a 2-bit value:
 
 | Value | Meaning | Struct, `CAN_ID_`/`CAN_DLC_`/`CAN_META_` macros and `as_<Name>` | `processMessage()` and dispatch `case` |
 |---|---|---|---|
@@ -147,7 +149,7 @@ Example, from Telemetry2021 `nick-22Library`:
 The pattern used by Telemetry2021 `nick-22Library` (`Telemetry.ino`, `SensorInputs.cpp`):
 
 ```cpp
-#include "src/CANApi/CANHelper.hpp"
+#include "src/CANApi/src/CANHelper.hpp"
 
 CANHelper::CANHandler canHandler(10, CAN_125KBPS);    // MCP2515 chip select pin, bus speed (8 MHz crystal assumed)
 
@@ -186,6 +188,6 @@ The macros `LATEST_MSG`, `LATEST_MSG_ID`, `LATEST_MSG_DLC` and `LATEST_MSG_DATA`
 | [requirements.txt](requirements.txt) | Its Python requirements (openpyxl) |
 | [excelMacroModule.vba](excelMacroModule.vba) | An exported copy of the VBA module inside `CANConfig.xlsm` (`CamelCase`, `CStruct`, `structUnpackCode`), so it can be read and diffed. Excel uses the copy in the workbook; if you change one, change the other (it matched the workbook in Nov 2026). |
 | [ApiDrafts/](ApiDrafts) | Hand-written drafts of the v1.0 output format, made before the generator was written (June 2024). They do not compile and are kept for reference only. |
-| [generatedAPIs/test.hpp, test.cpp](generatedAPIs) | An example of the generator's output, the same as `CANApi/CanApiv10.*` apart from the include guard, so that it can be read without checking out the submodule. The tests check it is up to date. |
+| [generatedAPIs/test.hpp, test.cpp](generatedAPIs) | An example of the generator's output, the same as `CANApi/src/generated/CanApi.*` apart from the include guard, so that it can be read without checking out the submodule. The tests check it is up to date. |
 
 The copy of `CANHelper.hpp/.cpp` that used to be here was out of date and has been removed: the files in CANApi are the ones used.

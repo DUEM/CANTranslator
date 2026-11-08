@@ -22,7 +22,8 @@ CANAPI = os.path.join(ROOT, 'CANApi')
 STUBS = os.path.join(ROOT, 'Tests', 'stubs')
 
 needs_gpp = pytest.mark.skipif(shutil.which('g++') is None, reason='g++ is not installed')
-needs_canapi = pytest.mark.skipif(not os.path.isfile(os.path.join(CANAPI, 'CANHelper.hpp')),
+CANAPI_SRC = os.path.join(CANAPI, 'src')
+needs_canapi = pytest.mark.skipif(not os.path.isfile(os.path.join(CANAPI_SRC, 'CANHelper.hpp')),
                                   reason='CANApi submodule not checked out (git submodule update --init)')
 
 
@@ -55,10 +56,10 @@ def test_example_output_is_up_to_date(messages):
 
 @needs_canapi
 def test_canapi_is_up_to_date(messages):
-    """CANApi/CanApiv10.* must be what the spreadsheet generates: regenerate it after changing either."""
-    header, impl = CanApiGen.generate(messages, 'CanApiv10')
-    assert read(os.path.join(CANAPI, 'CanApiv10.hpp')) == header
-    assert read(os.path.join(CANAPI, 'CanApiv10.cpp')) == impl
+    """CANApi/src/generated/CanApi.* must be what the spreadsheet generates: regenerate it after changing either."""
+    header, impl = CanApiGen.generate(messages, 'CanApi')
+    assert read(os.path.join(CANAPI_SRC, 'generated', 'CanApi.hpp')) == header
+    assert read(os.path.join(CANAPI_SRC, 'generated', 'CanApi.cpp')) == impl
 
 
 def test_big_endian_field_offsets(messages):
@@ -168,7 +169,7 @@ def test_usage(capsys):
 
 HARNESS = r'''
 #include <stdio.h>
-#include "src/CANApi/CANHelper.hpp"
+#include "src/CANApi/src/CANHelper.hpp"
 using namespace CANHelper;
 
 %(handlers)s
@@ -221,17 +222,17 @@ def handler(m):
 
 
 def build(directory, use_msg_list, handlers=''):
-    """Lays out a sketch (UseMsgList.hpp, src/CANApi/...) like the firmware and compiles it."""
-    api = directory / 'src' / 'CANApi'
-    api.mkdir(parents=True)
-    assert CanApiGen.main(['-c', CONFIG, '-h', str(api / 'CanApiv10')]) == 0
+    """Lays out a sketch (UseMsgList.hpp, src/CANApi/src/...) like the firmware and compiles it."""
+    api = directory / 'src' / 'CANApi' / 'src'
+    (api / 'generated').mkdir(parents=True)
+    assert CanApiGen.main(['-c', CONFIG, '-h', str(api / 'generated' / 'CanApi')]) == 0
     for name in ('CANHelper.hpp', 'CANHelper.cpp'):
-        shutil.copy(os.path.join(CANAPI, name), str(api / name))
+        shutil.copy(os.path.join(CANAPI_SRC, name), str(api / name))
     (directory / 'UseMsgList.hpp').write_text(use_msg_list)
     (directory / 'main.cpp').write_text('#include <stdlib.h>\n' + HARNESS % {'handlers': handlers})
     program = str(directory / 'harness')
     result = subprocess.run(['g++', '-std=gnu++11', '-Wall', '-I', STUBS, '-o', program, 'main.cpp',
-                             'src/CANApi/CANHelper.cpp', 'src/CANApi/CanApiv10.cpp'],
+                             'src/CANApi/src/CANHelper.cpp', 'src/CANApi/src/generated/CanApi.cpp'],
                             cwd=str(directory), capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     errors = [line for line in result.stderr.splitlines()
@@ -248,7 +249,7 @@ def run(program, frames):
 @pytest.fixture(scope='module')
 def all_messages(tmp_path_factory, messages):
     """Every message enabled for reading and writing, plus processAll."""
-    if shutil.which('g++') is None or not os.path.isfile(os.path.join(CANAPI, 'CANHelper.hpp')):
+    if shutil.which('g++') is None or not os.path.isfile(os.path.join(CANAPI_SRC, 'CANHelper.hpp')):
         pytest.skip('needs g++ and the CANApi submodule')
     use = ''.join('#define USE_MSG_%s 0b11\n' % m.full_name for m in messages) + '#define PROCESS_ALL_MSG\n'
     return build(tmp_path_factory.mktemp('all'), use, ''.join(handler(m) for m in messages))

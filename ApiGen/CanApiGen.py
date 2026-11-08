@@ -1,7 +1,7 @@
-"""Generates the CANApi message API (e.g. CanApiv10.hpp/.cpp) from the CAN message spreadsheet.
+"""Generates the CANApi message API (CANApi/src/generated/CanApi.hpp/.cpp) from the CAN message spreadsheet.
 
 Usage (from the top of the repository):
-    python3 ApiGen/CanApiGen.py -c config/CANConfig.xlsm -h CANApi/CanApiv10
+    python3 ApiGen/CanApiGen.py -c config/CANConfig.xlsm -h CANApi/src/generated/CanApi
 
 See ApiGen/README.md for what is generated, and config/README.md for the spreadsheet.
 The spreadsheet is checked first; if anything is wrong, the problems are listed and no
@@ -18,7 +18,7 @@ USAGE = """usage: python3 ApiGen/CanApiGen.py -c <spreadsheet .xlsm> -h <output 
 
   -c, --configTable   the CAN message spreadsheet, e.g. config/CANConfig.xlsm
   -h, --headerStream  where to write the API, without an extension: writes <path>.hpp and <path>.cpp,
-                      e.g. CANApi/CanApiv10 (the name CANHelper.hpp includes)
+                      e.g. CANApi/src/generated/CanApi (the file CANHelper.hpp includes)
       --help          show this message"""
 
 # Columns of the "CAN Data" sheet (0-based: A = 0)
@@ -40,6 +40,10 @@ IDENTIFIER = re.compile(r'^[A-Za-z_][A-Za-z0-9_]*$')
 CAN_ID = re.compile(r'^0x[0-9A-Fa-f]{1,3}$')
 FIELD_LINE = re.compile(r'^\t(\w+) (\w+);$')
 RECALCULATE = "recalculate (Ctrl+Alt+F9) and save in Excel"
+# First lines of both generated files. Kept free of dates and commit hashes so that the output only
+# changes when the spreadsheet does (the tests compare the committed files with a fresh run)
+GENERATED_NOTICE = ("// GENERATED FILE: DO NOT EDIT. Written by CANTranslator (ApiGen/CanApiGen.py) from config/CANConfig.xlsm.\n"
+                    "// To add or change a CAN message, edit the spreadsheet and regenerate: https://github.com/DUEM/CANTranslator\n")
 
 
 class Message:
@@ -224,12 +228,14 @@ def generate(messages, guard_name):
     """Returns (header text, implementation text)."""
     header, impl, process_decls, union_members = [], [], [], []
 
+    header.append(GENERATED_NOTICE)
     header.append("#ifndef " + guard_name + "_INCLUDE_GUARD\n")
     header.append("#define " + guard_name + "_INCLUDE_GUARD\n")
     header.append("#include \"mcp2515.h\"\n")
     header.append("namespace CANHelper::Messages {\n")
 
-    impl.append('#include "CANHelper.hpp"\n')
+    impl.append(GENERATED_NOTICE)
+    impl.append('#include "../CANHelper.hpp"\n')  # the API is written to CANApi/src/generated/, CANHelper is in CANApi/src/
     impl.append("//Reverses the byte order of one multi-byte field. Used for big-endian (BIG) messages\n")
     impl.append("static inline void swapBytes(__u8* field, __u8 size) {\n"
                 "\tfor (__u8 i = 0; i < size / 2; i++) {\n"

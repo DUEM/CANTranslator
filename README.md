@@ -1,6 +1,6 @@
 # CANTranslator
 
-_Generates the C++ CAN message API (CANApi) used by the DUSC telemetry board firmware. The API is generated from one spreadsheet that lists every CAN message on the vehicle. It produces CANApi v1.0 (`CanApiv10.hpp/.cpp`), the version used by the `nick-22Library` branch of Telemetry2021. Documented and fixed Nov 2026._
+_Generates the C++ CAN message API (CANApi) used by the DUSC telemetry board firmware. The API is generated from one spreadsheet that lists every CAN message on the vehicle. It produces CANApi v1.0 (`src/generated/CanApi.hpp/.cpp` in CANApi; `CanApiv10.hpp/.cpp` before the Nov 2026 restructure), the version used by the `nick-22Library` branch of Telemetry2021. Documented and fixed Nov 2026._
 
 ## System overview
 
@@ -8,11 +8,11 @@ _Generates the C++ CAN message API (CANApi) used by the DUSC telemetry board fir
  config/CANConfig.xlsm   (one row per CAN message: CAN ID, length, byte names, data types, byte order)
    │  Excel VBA functions build the C struct for each row (ApiGen/excelMacroModule.vba)
    ▼
- python3 ApiGen/CanApiGen.py -c config/CANConfig.xlsm -h CANApi/CanApiv10
+ python3 ApiGen/CanApiGen.py -c config/CANConfig.xlsm -h CANApi/src/generated/CanApi
    │  checks the spreadsheet first; writes nothing if anything is wrong
    ▼
- CANApi/CanApiv10.hpp, CanApiv10.cpp   (generated: message structs, CAN ID macros, dispatch switch)
- CANApi/CANHelper.hpp, CANHelper.cpp   (hand-written: MCP2515 wrapper, read() and send())
+ CANApi/src/generated/CanApi.hpp, .cpp   (generated: message structs, CAN ID macros, dispatch switch)
+ CANApi/src/CANHelper.hpp, .cpp          (hand-written: MCP2515 wrapper, read() and send())
    │  committed to the DUEM/CANApi repository (git submodule here, at CANApi/)
    ▼
  Telemetry2021 firmware, Telemetry/src/CANApi submodule
@@ -41,11 +41,12 @@ This repository used to decode the raw hex logs from the board's SD card as well
 |---|---|---|---|
 | `8d050b1` (Aug 2023, merged as `v0.4`) | `CanApiv04.hpp/.cpp` | the earlier `translator/Translator.py`, removed in Nov 2024 (still in git history before commit `d126975`) | `PERI-DEVELOPMENT-TPB-1126`, `ESC-CODE` |
 | `fe308f7` (Jun 2024, `v1.0-beta.4`) | `CanApiv10.hpp/.cpp` | [ApiGen/CanApiGen.py](ApiGen/CanApiGen.py), before the Nov 2026 fixes | `nick-22Library` |
-| branch `PERI-DEVELOPMENT-TPB-1126-fixes` (Nov 2026) | `CanApiv10.hpp/.cpp` | [ApiGen/CanApiGen.py](ApiGen/CanApiGen.py) as it is now | not yet used; see [Changes made in November 2026](#changes-made-in-november-2026) |
+| branch `PERI-DEVELOPMENT-TPB-1126-fixes` (Nov 2026) | `CanApiv10.hpp/.cpp` | [ApiGen/CanApiGen.py](ApiGen/CanApiGen.py) with the Nov 2026 fixes | not yet used; see [Changes made in November 2026](#changes-made-in-november-2026) |
+| branch `TPB-1126-restructure` (Nov 2026, draft) | `src/generated/CanApi.hpp/.cpp` | [ApiGen/CanApiGen.py](ApiGen/CanApiGen.py) as it is now | not yet used. Same API as the fixes branch, new file layout: firmware includes `src/CANApi/src/CANHelper.hpp` |
 
 The v0.4 and v1.0 APIs are **not source compatible**. v0.4 has one struct per message deriving from `CANMsg` (e.g. `Telemetry::_TimeAndFix`) and a free `processMessage()` function. v1.0 has plain structs in a union, a `CANHandler` class and `processMessage()` member functions (see [ApiGen/README.md](ApiGen/README.md)).
 
-`CANApi/CanApiv10.hpp/.cpp` must always be exactly what the generator produces from [config/CANConfig.xlsm](config/CANConfig.xlsm). The tests check this.
+`CANApi/src/generated/CanApi.hpp/.cpp` must always be exactly what the generator produces from [config/CANConfig.xlsm](config/CANConfig.xlsm). The tests check this.
 
 ## First-time setup
 
@@ -69,7 +70,7 @@ You only need Python and openpyxl to run the generator, and `g++` for the tests 
    ```shell
    git -C CANApi switch main
    git -C CANApi pull
-   python3 ApiGen/CanApiGen.py -c config/CANConfig.xlsm -h CANApi/CanApiv10
+   python3 ApiGen/CanApiGen.py -c config/CANConfig.xlsm -h CANApi/src/generated/CanApi
    python3 ApiGen/CanApiGen.py -c config/CANConfig.xlsm -h ApiGen/generatedAPIs/test
    ```
    `-h` is the output path **without** an extension: it writes `.hpp` and `.cpp` files, replacing any already there. The script lists each message and ends with `Generated ...`. If it finds a problem in the spreadsheet (a duplicate name or CAN ID, sizes that do not add up to the DLC, a value Excel has not recalculated, ...) it lists the problems and writes **nothing**. Fix them in Excel and run it again.
@@ -86,7 +87,7 @@ You only need Python and openpyxl to run the generator, and `g++` for the tests 
    ```
 7. Update the Telemetry2021 DBC files so the receiver can decode the message.
 
-Never edit `CanApiv10.hpp` or `CanApiv10.cpp` by hand: the next run of the generator overwrites them. `CANHelper.hpp/.cpp` in CANApi are hand-written and are not touched by the generator.
+Never edit `CanApi.hpp` or `CanApi.cpp` by hand: the next run of the generator overwrites them (both start with a `GENERATED FILE: DO NOT EDIT` notice). `src/CANHelper.hpp/.cpp` in CANApi are hand-written and are not touched by the generator.
 
 ## Testing
 
@@ -97,7 +98,7 @@ pytest
 [Tests/test_canapigen.py](Tests/test_canapigen.py) checks that:
 
 * the committed spreadsheet passes all the generator's checks
-* `CANApi/CanApiv10.*` and `ApiGen/generatedAPIs/test.*` are exactly what the spreadsheet generates
+* `CANApi/src/generated/CanApi.*` and `ApiGen/generatedAPIs/test.*` are exactly what the spreadsheet generates
 * the generator catches each kind of spreadsheet problem (using small made-up spreadsheets)
 * the generated API, with **every message enabled**, compiles with `g++` together with CANApi's `CANHelper` and a stub of the MCP2515 library ([Tests/stubs/mcp2515.h](Tests/stubs/mcp2515.h)), and decodes test frames correctly: little-endian and big-endian (signed and unsigned) messages, unknown IDs, `processAll()` getting the frame unchanged, `reverseBytes()`, and `USE_MSG_` macros with no value
 
@@ -112,7 +113,7 @@ The compile tests use the laptop's compiler, not `avr-gcc`, so they do not repla
 │   └── CANConfig.xlsm             (THE CAN message list: one row per message; macro-enabled Excel workbook)
 ├── ApiGen                         (the generator, see ApiGen/README.md)
 │   ├── README.md
-│   ├── CanApiGen.py               (spreadsheet → CanApiv10.hpp/.cpp, with checks)
+│   ├── CanApiGen.py               (spreadsheet → CanApi.hpp/.cpp, with checks)
 │   ├── requirements.txt           (openpyxl)
 │   ├── excelMacroModule.vba       (exported copy of the VBA functions inside CANConfig.xlsm; for reading and diffs only)
 │   ├── ApiDrafts                  (hand-written drafts of the v1.0 output format, June 2024; do not compile)
@@ -123,7 +124,7 @@ The compile tests use the laptop's compiler, not `avr-gcc`, so they do not repla
 │   ├── test_canapigen.py
 │   ├── requirements-test.txt
 │   └── stubs/mcp2515.h            (stand-in for the Arduino MCP2515 library, for compiling on a laptop)
-├── CANApi                         (git submodule: DUEM/CANApi; the generator writes CanApiv10.hpp/.cpp here)
+├── CANApi                         (git submodule: DUEM/CANApi; the generator writes src/generated/CanApi.hpp/.cpp here)
 ├── pytest.ini
 ├── .gitmodules
 ├── .gitignore                     (ignores Excel lock files ~$*.xlsm, .DS_Store and Python caches)

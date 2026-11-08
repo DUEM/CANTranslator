@@ -1,4 +1,6 @@
-#include "CANHelper.hpp"
+// GENERATED FILE: DO NOT EDIT. Written by CANTranslator (ApiGen/CanApiGen.py) from config/CANConfig.xlsm.
+// To add or change a CAN message, edit the spreadsheet and regenerate: https://github.com/DUEM/CANTranslator
+#include "../CANHelper.hpp"
 //Reverses the byte order of one multi-byte field. Used for big-endian (BIG) messages
 static inline void swapBytes(__u8* field, __u8 size) {
 	for (__u8 i = 0; i < size / 2; i++) {
