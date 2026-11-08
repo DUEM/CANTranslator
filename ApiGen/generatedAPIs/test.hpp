@@ -16,7 +16,7 @@ namespace CANHelper::Messages {
 			uint8_t GpsYear;
 			uint8_t GpsFix;
 			uint8_t GpsFixquality;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Telemetry_SpeedAndAngle
@@ -27,7 +27,7 @@ namespace CANHelper::Messages {
 		struct SpeedAndAngle {
 			float GpsSpeed;
 			float GpsAngle;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Telemetry_Latitude
@@ -38,7 +38,7 @@ namespace CANHelper::Messages {
 		struct Latitude {
 			float GpsLatitude;
 			char GpsLat;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Telemetry_Longitude
@@ -49,7 +49,7 @@ namespace CANHelper::Messages {
 		struct Longitude {
 			float GpsLongitude;
 			char GpsLon;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Telemetry_AltitudeAndSatellites
@@ -60,7 +60,7 @@ namespace CANHelper::Messages {
 		struct AltitudeAndSatellites {
 			float GpsAltitude;
 			uint8_t GpsSatellites;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Telemetry_SystemStatusMessages
@@ -77,7 +77,7 @@ namespace CANHelper::Messages {
 			uint8_t Spare1;
 			uint8_t Spare2;
 			uint8_t Spare3;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_DriverControls_SpeedValCurrVal
@@ -88,7 +88,7 @@ namespace CANHelper::Messages {
 		struct SpeedValCurrVal {
 			float DriverSetSpeed;
 			float DriverSetCurrent;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_DriverControls_Maxbuscurrent
@@ -99,7 +99,7 @@ namespace CANHelper::Messages {
 		struct Maxbuscurrent {
 			float Zero;
 			float MaxBusCurrent;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_IdentificationInfo
@@ -110,7 +110,7 @@ namespace CANHelper::Messages {
 		struct IdentificationInfo {
 			uint32_t TritiumId;
 			uint32_t SerialNumber;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_StatusInformation
@@ -124,7 +124,7 @@ namespace CANHelper::Messages {
 			uint16_t ActiveMotor;
 			uint8_t TransmitErrorCount;
 			uint8_t ReceiveErrorCount;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_BusMeasurement
@@ -135,7 +135,7 @@ namespace CANHelper::Messages {
 		struct BusMeasurement {
 			float BusVoltage;
 			float BusCurrent;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_Velocity
@@ -146,7 +146,7 @@ namespace CANHelper::Messages {
 		struct Velocity {
 			float MotorVelocity;
 			float VehicleVelocity;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_PhaseCurrent
@@ -157,7 +157,7 @@ namespace CANHelper::Messages {
 		struct PhaseCurrent {
 			float PhaseBCurrent;
 			float PhaseCCurrent;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_MotorVoltageVector
@@ -168,7 +168,7 @@ namespace CANHelper::Messages {
 		struct MotorVoltageVector {
 			float VectVoltImag;
 			float VectVoltReal;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_MotorCurrentVector
@@ -179,7 +179,7 @@ namespace CANHelper::Messages {
 		struct MotorCurrentVector {
 			float VectCurrImag;
 			float VectCurrReal;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_MotorBackemfVector
@@ -190,7 +190,7 @@ namespace CANHelper::Messages {
 		struct MotorBackemfVector {
 			float PeakBackEmfPhaseToNeutral;
 			float BackEmfD;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_Rail_15V
@@ -201,7 +201,7 @@ namespace CANHelper::Messages {
 		struct Rail_15V {
 			float Reserved;
 			float FifteenVSupply;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_Rail_3_3VAnd1_9V
@@ -212,7 +212,7 @@ namespace CANHelper::Messages {
 		struct Rail_3_3VAnd1_9V {
 			float OneNineVSupply;
 			float ThreeThreeVSupply;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_SinkMotorTemperature
@@ -223,7 +223,7 @@ namespace CANHelper::Messages {
 		struct SinkMotorTemperature {
 			float MotorTemp;
 			float HeatSinkTemp;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_DspBoardTemperature
@@ -234,7 +234,7 @@ namespace CANHelper::Messages {
 		struct DspBoardTemperature {
 			float DspBoardTemp;
 			float Reserved;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_OdoBusAmphours
@@ -245,7 +245,7 @@ namespace CANHelper::Messages {
 		struct OdoBusAmphours {
 			float Odometer;
 			float DcBusAmpHours;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Tritium_SlipSpeedMeasurement
@@ -256,7 +256,7 @@ namespace CANHelper::Messages {
 		struct SlipSpeedMeasurement {
 			float Reserved;
 			float SlipSpeed;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Orion_PackParametersDefaultId
@@ -269,7 +269,7 @@ namespace CANHelper::Messages {
 			uint16_t PackInstVoltage;
 			uint8_t PackSoc;
 			uint16_t RelayState;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Orion_CellTempsDclDefaultId
@@ -283,7 +283,7 @@ namespace CANHelper::Messages {
 			int8_t HighTemperatureSensor;
 			int8_t LowTemperatureSensors;
 			int8_t Blank;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Orion_PackParameters
@@ -296,7 +296,7 @@ namespace CANHelper::Messages {
 			uint16_t PackInstVoltage;
 			uint8_t PackSoc;
 			uint16_t RelayState;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Orion_CellTempsDcl
@@ -310,7 +310,7 @@ namespace CANHelper::Messages {
 			int8_t HighTemperatureSensor;
 			int8_t LowTemperatureSensors;
 			int8_t Blank;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Orion_CellVoltages
@@ -326,7 +326,7 @@ namespace CANHelper::Messages {
 			int8_t IntakeTemperature;
 			int8_t BlankA;
 			int8_t BlankB;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Telemetry_MpptPollJaved
@@ -336,7 +336,7 @@ namespace CANHelper::Messages {
 	namespace Telemetry {
 		struct MpptPollJaved {
 			int8_t Blank;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Telemetry_MpptPollWoof
@@ -346,7 +346,7 @@ namespace CANHelper::Messages {
 	namespace Telemetry {
 		struct MpptPollWoof {
 			int8_t Blank;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Mppt_Javed
@@ -362,7 +362,7 @@ namespace CANHelper::Messages {
 			uint8_t MsbVoltageOut;
 			uint8_t LsbVoltageOut;
 			uint8_t AmbientTemperature;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 #ifdef USE_MSG_Mppt_Woof
@@ -378,7 +378,7 @@ namespace CANHelper::Messages {
 			uint8_t MsbVoltageOut;
 			uint8_t LsbVoltageOut;
 			uint8_t AmbientTemperature;
-		} __attribute__((aligned(8)));
+		} __attribute__((packed, aligned(8)));
 		};
 #endif
 	union CastedCANPayload {

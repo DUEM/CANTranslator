@@ -246,7 +246,8 @@ def generate(messages, guard_name):
         header.append("#define CAN_DLC_" + name + " " + str(m.dlc) + "\n")
         header.append("#define CAN_META_" + name + " {" + m.can_id + ", " + str(m.dlc) + "}\n")
         header.append("\tnamespace " + m.source + " {\n")
-        struct = "\t" + m.struct_text + " __attribute__((aligned(8)));\n"
+        # packed: no padding between fields on any compiler; aligned(8): same alignment as can_frame.data
+        struct = "\t" + m.struct_text + " __attribute__((packed, aligned(8)));\n"
         header.append("\t" + struct.replace("\n", "\n\t\t"))
         header.append("};\n")
         header.append("#endif\n")
