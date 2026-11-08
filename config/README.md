@@ -19,7 +19,7 @@ It is a macro-enabled Excel workbook. Three VBA worksheet functions in it (`Came
 
 | Column | Heading | Who fills it | Meaning |
 |---|---|---|---|
-| A | `Active/Confirmed` | You | `Y`, `N` or `P`. For information only: **the generator ignores it.** The row containing `END` here marks the end of the list. |
+| A | `Active/Confirmed` | You | `Y` (confirmed) or `P`: the message is generated. `N`: the row is **skipped** (kept for reference only). The row containing `END` here marks the end of the list. |
 | B | `Item` | You | The message name in plain words, e.g. `Time and fix` |
 | C | `Source` | You | The device that sends it, e.g. `Telemetry`, `Tritium`, `Orion`, `MPPT` |
 | D | `Period (s)` | You | How often the message is sent, in seconds (information only) |
@@ -29,13 +29,13 @@ It is a macro-enabled Excel workbook. Three VBA worksheet functions in it (`Came
 | H to O | `BYTE_0` to `BYTE_7` | You | The name of the value that **starts** in each byte. See [Byte columns](#byte-columns). |
 | P, Q | `freq`, `rate (byte/s)` | Formula | Messages per second and bytes per second, from D and G (information only, for estimating bus and radio load) |
 | R | `data type` | You | The type of each value, in order. See [Data types](#data-types). |
-| S | `Endianness` | You | `LITTLE` or `BIG`: the byte order of multi-byte values. `BIG` makes the generated code reverse the bytes before handling the message (see [Known limitations](../README.md#known-limitations)). |
+| S | `Endianness` | You | `LITTLE` or `BIG`: the byte order of multi-byte values. For `BIG`, the generated code swaps the bytes of each multi-byte field before handling the message (see [ApiGen/README.md](../ApiGen/README.md#what-it-generates)). |
 | T | `struct unpack code` | `structUnpackCode` | A Python `struct` format string, e.g. `<fc`. Was used by the old hex decoder; not used now. |
 | U | `c struct` | `CStruct` | **The C struct the generator copies into the header.** Shows `#VALUE!` if R does not match G. |
 | V | `Labels to be used in code` | | Empty, not used |
 | W | `ItemCC` | `CamelCase` of B (can be typed over) | The message name in code, e.g. `TimeAndFix` |
 | X | `SourceCC` | `CamelCase` of C | The sender name in code, used as a namespace, e.g. `Telemetry` |
-| Y to AF | `BYTE_0CC` to `BYTE_7CC` | `CamelCase` of H to O | The field names in code, e.g. `GpsHour`. `-` for `IN USE` and `-` bytes. |
+| Y to AF | `BYTE_0CC` to `BYTE_7CC` | `CamelCase` of H to O (can be typed over) | The field names in code, e.g. `GpsHour`. `-` for `IN USE` and `-` bytes. |
 
 The rows below `END` ("Suggested format for custom CAN code") are old notes and are ignored.
 
@@ -94,18 +94,23 @@ The sizes must add up to the DLC in column G. There are no bit fields: a message
 
 The names in columns W to AF are made by `CamelCase`: every character that is not a letter becomes a space, then each word is capitalised and the spaces removed. So `GPS_fixquality` becomes `GpsFixquality` and `Pack Inst. Voltage` becomes `PackInstVoltage`.
 
-**Digits are removed as well**, so `15 Volt. Rail` would become `VoltRail`, and `Testbed enviroCAN.ino1` and `Testbed enviroCAN.ino2` both become `TestbedEnvirocanIno`. Where that matters, type the name into column W over the formula, as was done for `Velocity`, `Rail_15V` and `Rail_3_3VAnd1_9V` (0x603, 0x608, 0x609).
+**Digits are removed as well**, so `15 Volt. Rail` would become `VoltRail` and `spare1` would become `Spare`. Where that matters, type the name you want over the formula cell (W for a message, Y to AF for a field), as was done for:
 
-The firmware refers to a message as `<SourceCC>_<ItemCC>` (e.g. `USE_MSG_Telemetry_TimeAndFix`, `as_Telemetry_TimeAndFix`), so this pair **must be unique** among the messages a firmware enables. Some rows share a name at the moment; see [Known limitations](../README.md#known-limitations).
+* `Velocity`, `Rail_15V` and `Rail_3_3VAnd1_9V` (W15, W20, W21: 0x603, 0x608, 0x609)
+* `Spare1`, `Spare2` and `Spare3` (AD7 to AF7: 0x111)
 
-Changing a name changes the API, so any firmware using the old name will need updating.
+The generator checks names typed over like this only for being valid C++ names; it checks the formula cells against what the formula would give now.
+
+The firmware refers to a message as `<SourceCC>_<ItemCC>` (e.g. `USE_MSG_Telemetry_TimeAndFix`, `as_Telemetry_TimeAndFix`), so this pair **must be unique** among the rows that are generated (not marked `N`). Field names must be unique within a message. The generator stops with an error if they are not.
+
+Changing a name changes the API, so any firmware using the old name will need updating. The names changed in November 2026 are listed in the [top-level README](../README.md#changes-made-in-november-2026).
 
 ## Editing the spreadsheet
 
 * Use **Microsoft Excel** on Windows or macOS (desktop, not the web version). The formula columns need the workbook's VBA functions, which other spreadsheet programs may not run.
 * When Excel shows the yellow security bar, click **Enable Content**. If Excel says macros are blocked because the file came from the internet, close it, open the file's **Properties** in Windows Explorer, tick **Unblock**, and open it again.
 * After editing, press **Ctrl+Alt+F9** to recalculate everything before saving. Excel does not know the VBA functions depend on the `DataTypes` sheet, so it might not update every cell otherwise.
-* Save as `.xlsm` with `CAN Data` as the active sheet. The generator reads the values Excel saved, so a file that has not been recalculated and saved in Excel gives wrong output.
+* Save as `.xlsm` with `CAN Data` as the active sheet. The generator reads the values Excel saved. If they are out of date (not recalculated, or saved by another program), it reports which cells and stops.
 
 ## Adding a message
 
@@ -115,8 +120,9 @@ Changing a name changes the API, so any firmware using the old name will need up
 4. Check that:
    * column U shows a struct with the right fields, not `#VALUE!`
    * column W and X give a `<SourceCC>_<ItemCC>` that no other row has (type over W if needed)
+   * no two fields of the message have the same name (columns Y to AF)
 5. Press Ctrl+Alt+F9, then save.
-6. Generate the API and update the firmware as described in the [top-level README](../README.md#how-to-add-or-change-a-can-message).
+6. Generate the API and update the firmware as described in the [top-level README](../README.md#how-to-add-or-change-a-can-message). If the generator lists problems, fix them and save again.
 
 ## Keeping the DBC files in step
 
@@ -126,12 +132,10 @@ The DBC files mostly use the same `SourceCC` and `ItemCC` names (as sender and m
 
 | CAN ID | Here | In the DBC files |
 |---|---|---|
-| 0x601 | `Tritium::StausInformation` | `StatusInformation` |
-| 0x60A | `Tritium::Reserved` | `Reserved1` |
-| 0x6B0, 0x6B1 | `Orion::CellVoltages`, `Orion::CellTempsDischargeChageCurrentLimit` | not present |
-| 0x700 | `Orion::CellVoltages` | `PackParameters` |
-| 0x701 | `Orion::CellTempsDischargeChageCurrentLimit` | `CellTempsDCL` |
-| 0x702 | `Orion::CellTempsDischargeChageCurrentLimit` | `CellVoltages` |
-| 0x1B1, 0x1B2 | `Testbed::TestbedEnvirocanIno` | not present |
+| 0x60A, 0x60D | `Tritium::ReservedA`, `Tritium::ReservedB` (marked `N`, not generated) | `Reserved1`, `Reserved` |
+| 0x6B0, 0x6B1 | `Orion::PackParametersDefaultId`, `Orion::CellTempsDclDefaultId` (the Orion BMS's default IDs for 0x700 and 0x701) | not present |
+| 0x701 | `Orion::CellTempsDcl` | `CellTempsDCL` |
+| 0x702 | `Orion::CellVoltages`: seven 1-byte values | `CellVoltages`: **a different layout** (16-bit low and high cell voltage, then internal temperature); check against the Orion BMS profile before using it |
+| 0x1B1, 0x1B2 | `Testbed::...` (marked `N`, not generated) | not present |
 
 The DBC files also include messages that are not here, e.g. the driver controls commands (0x023) and the second (right) motor controller (0x041 to 0x08E).
