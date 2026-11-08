@@ -229,6 +229,14 @@ def generate(messages, guard_name):
     header.append("namespace CANHelper::Messages {\n")
 
     impl.append('#include "CANHelper.hpp"\n')
+    impl.append("//Reverses the byte order of one multi-byte field. Used for big-endian (BIG) messages\n")
+    impl.append("static inline void swapBytes(__u8* field, __u8 size) {\n"
+                "\tfor (__u8 i = 0; i < size / 2; i++) {\n"
+                "\t\t__u8 temp = field[i];\n"
+                "\t\tfield[i] = field[size - 1 - i];\n"
+                "\t\tfield[size - 1 - i] = temp;\n"
+                "\t}\n"
+                "}\n")
     impl.append("namespace CANHelper {\n\tvoid CANHandler::DispatchMsg() {\n\t\tswitch(LATEST_MSG_ID) {\n")
 
     for m in messages:
@@ -244,11 +252,19 @@ def generate(messages, guard_name):
         header.append("#endif\n")
 
         impl.append(read_enabled(name))
-        impl.append("\t\tcase " + m.can_id + ":\n")
         if m.big_endian:
-            impl.append("\t\t\tthis->reverseBytes(LATEST_MSG);\n")
-        impl.append("\t\t\tthis->processMessage(LATEST_MSG_DATA.as_" + name + ");\n")
-        impl.append("\t\t\tbreak;\n")
+            # Swap each field in a copy, so that processAll() still gets the frame exactly as received
+            impl.append("\t\tcase " + m.can_id + ": {\n")
+            impl.append("\t\t\tMessages::CastedCANPayload swapped = LATEST_MSG_DATA; //big-endian message\n")
+            for _, field, size, offset in m.fields:
+                if size > 1:
+                    impl.append("\t\t\tswapBytes(reinterpret_cast<__u8*>(&swapped) + %d, %d); //%s\n" % (offset, size, field))
+            impl.append("\t\t\tthis->processMessage(swapped.as_" + name + ");\n")
+            impl.append("\t\t\tbreak;\n\t\t}\n")
+        else:
+            impl.append("\t\tcase " + m.can_id + ":\n")
+            impl.append("\t\t\tthis->processMessage(LATEST_MSG_DATA.as_" + name + ");\n")
+            impl.append("\t\t\tbreak;\n")
         impl.append("#endif\n")
 
         process_decls.append(read_enabled(name))

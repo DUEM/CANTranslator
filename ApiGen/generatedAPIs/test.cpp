@@ -1,4 +1,12 @@
 #include "CANHelper.hpp"
+//Reverses the byte order of one multi-byte field. Used for big-endian (BIG) messages
+static inline void swapBytes(__u8* field, __u8 size) {
+	for (__u8 i = 0; i < size / 2; i++) {
+		__u8 temp = field[i];
+		field[i] = field[size - 1 - i];
+		field[size - 1 - i] = temp;
+	}
+}
 namespace CANHelper {
 	void CANHandler::DispatchMsg() {
 		switch(LATEST_MSG_ID) {
@@ -113,34 +121,49 @@ namespace CANHelper {
 			break;
 #endif
 #if defined(USE_MSG_Orion_PackParametersDefaultId) && ((USE_MSG_Orion_PackParametersDefaultId & 0b10) == 2)
-		case 0x6B0:
-			this->reverseBytes(LATEST_MSG);
-			this->processMessage(LATEST_MSG_DATA.as_Orion_PackParametersDefaultId);
+		case 0x6B0: {
+			Messages::CastedCANPayload swapped = LATEST_MSG_DATA; //big-endian message
+			swapBytes(reinterpret_cast<__u8*>(&swapped) + 0, 2); //PackCurrent
+			swapBytes(reinterpret_cast<__u8*>(&swapped) + 2, 2); //PackInstVoltage
+			swapBytes(reinterpret_cast<__u8*>(&swapped) + 5, 2); //RelayState
+			this->processMessage(swapped.as_Orion_PackParametersDefaultId);
 			break;
+		}
 #endif
 #if defined(USE_MSG_Orion_CellTempsDclDefaultId) && ((USE_MSG_Orion_CellTempsDclDefaultId & 0b10) == 2)
-		case 0x6B1:
-			this->reverseBytes(LATEST_MSG);
-			this->processMessage(LATEST_MSG_DATA.as_Orion_CellTempsDclDefaultId);
+		case 0x6B1: {
+			Messages::CastedCANPayload swapped = LATEST_MSG_DATA; //big-endian message
+			swapBytes(reinterpret_cast<__u8*>(&swapped) + 0, 2); //PackDcl
+			swapBytes(reinterpret_cast<__u8*>(&swapped) + 2, 2); //Unknown
+			this->processMessage(swapped.as_Orion_CellTempsDclDefaultId);
 			break;
+		}
 #endif
 #if defined(USE_MSG_Orion_PackParameters) && ((USE_MSG_Orion_PackParameters & 0b10) == 2)
-		case 0x700:
-			this->reverseBytes(LATEST_MSG);
-			this->processMessage(LATEST_MSG_DATA.as_Orion_PackParameters);
+		case 0x700: {
+			Messages::CastedCANPayload swapped = LATEST_MSG_DATA; //big-endian message
+			swapBytes(reinterpret_cast<__u8*>(&swapped) + 0, 2); //PackCurrent
+			swapBytes(reinterpret_cast<__u8*>(&swapped) + 2, 2); //PackInstVoltage
+			swapBytes(reinterpret_cast<__u8*>(&swapped) + 5, 2); //RelayState
+			this->processMessage(swapped.as_Orion_PackParameters);
 			break;
+		}
 #endif
 #if defined(USE_MSG_Orion_CellTempsDcl) && ((USE_MSG_Orion_CellTempsDcl & 0b10) == 2)
-		case 0x701:
-			this->reverseBytes(LATEST_MSG);
-			this->processMessage(LATEST_MSG_DATA.as_Orion_CellTempsDcl);
+		case 0x701: {
+			Messages::CastedCANPayload swapped = LATEST_MSG_DATA; //big-endian message
+			swapBytes(reinterpret_cast<__u8*>(&swapped) + 0, 2); //PackDcl
+			swapBytes(reinterpret_cast<__u8*>(&swapped) + 2, 2); //Unknown
+			this->processMessage(swapped.as_Orion_CellTempsDcl);
 			break;
+		}
 #endif
 #if defined(USE_MSG_Orion_CellVoltages) && ((USE_MSG_Orion_CellVoltages & 0b10) == 2)
-		case 0x702:
-			this->reverseBytes(LATEST_MSG);
-			this->processMessage(LATEST_MSG_DATA.as_Orion_CellVoltages);
+		case 0x702: {
+			Messages::CastedCANPayload swapped = LATEST_MSG_DATA; //big-endian message
+			this->processMessage(swapped.as_Orion_CellVoltages);
 			break;
+		}
 #endif
 #if defined(USE_MSG_Telemetry_MpptPollJaved) && ((USE_MSG_Telemetry_MpptPollJaved & 0b10) == 2)
 		case 0x711:
